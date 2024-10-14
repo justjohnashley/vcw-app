@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "941588812528",
+    "firebase_url": "https://vulcanwash-db-default-rtdb.firebaseio.com",
+    "project_id": "vulcanwash-db",
+    "storage_bucket": "vulcanwash-db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:941588812528:android:591b5d6a340b401f0ae835",
+        "android_client_info": {
+          "package_name": "com.pural_ba3a.vulcanwash"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAehECcuoR8U9oXjkFu_t1PLtmXJn1oh0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
