@@ -32,13 +32,11 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                // Start the MainActivity
                 Intent intent = new Intent(MainActivity.this, WelcomePage.class);
                 startActivity(intent);
-                // Close SplashActivity
                 finish();
             }
-        }, 3000); // Delay for 3 seconds
+        }, 1000);
 
     }
 }

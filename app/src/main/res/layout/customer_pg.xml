@@ -9,6 +9,9 @@
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".CustomerPage">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/imageView4"
@@ -23,6 +26,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/textView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="105dp"
@@ -60,12 +64,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="Customer Login"
+                android:text="Login"
                 android:textAlignment="center"
                 android:textSize="32sp"
                 android:textStyle="bold" />
 
             <EditText
+                android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="15dp"
@@ -73,10 +78,11 @@
                 android:background="@drawable/gray_border"
                 android:drawableLeft="@drawable/baseline_person_24"
                 android:drawablePadding="8dp"
-                android:hint="Username"
+                android:hint="Email"
                 android:padding="8dp" />
 
             <EditText
+                android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginBottom="5dp"
@@ -107,6 +113,7 @@
 
 
                 <TextView
+                    android:id="@+id/csignup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -119,7 +126,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/lgBtn"
+                android:id="@+id/loginBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
@@ -161,5 +168,38 @@
         app:layout_constraintHorizontal_bias="0.05"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <FrameLayout
+        android:id="@+id/pgbarOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="visible"
+        android:alpha="0"
+        > <!-- Semi-transparent black background -->
+
+        <!-- Rounded box with video inside -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            app:cardCornerRadius="12dp"
+            >
+
+            <!-- VideoView for the MP4 -->
+            <VideoView
+                android:id="@+id/loadingVideoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop" /> <!-- Center the video inside the CardView -->
+
+
+        </androidx.cardview.widget.CardView>
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

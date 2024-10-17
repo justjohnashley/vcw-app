@@ -20,11 +20,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.pural_ba3a.vulcanwash.databinding.CustomerPgBinding;
+import com.pural_ba3a.vulcanwash.databinding.CustomerRegBinding;
 
-public class CustomerPage extends AppCompatActivity {
+public class CustomerReg extends AppCompatActivity {
 
-    CustomerPgBinding binding;
+    CustomerRegBinding binding;
     FirebaseAuth mAuth;
 
     @Override
@@ -32,7 +32,7 @@ public class CustomerPage extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(CustomerPage.this, UserPage.class);
+            Intent intent = new Intent(getApplicationContext(), UserPage.class);
             startActivity(intent);
 
             finish();
@@ -45,7 +45,7 @@ public class CustomerPage extends AppCompatActivity {
         EdgeToEdge.enable(this);
         mAuth = FirebaseAuth.getInstance();
 
-        binding = CustomerPgBinding.inflate(getLayoutInflater());
+        binding = CustomerRegBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -56,17 +56,17 @@ public class CustomerPage extends AppCompatActivity {
 
         binding.backBtn.setOnClickListener(view -> {
 
-            Intent intent = new Intent(CustomerPage.this, HomePage.class);
-            CustomerPage.this.startActivity(intent);
+            Intent intent = new Intent(CustomerReg.this, HomePage.class);
+            CustomerReg.this.startActivity(intent);
 
             finish();
 
         });
 
-        binding.csignup.setOnClickListener(view -> {
+        binding.clogin.setOnClickListener(view -> {
 
-            Intent intent = new Intent(CustomerPage.this, CustomerReg.class);
-            CustomerPage.this.startActivity(intent);
+            Intent intent = new Intent(CustomerReg.this, CustomerPage.class);
+            CustomerReg.this.startActivity(intent);
 
             finish();
 
@@ -81,9 +81,10 @@ public class CustomerPage extends AppCompatActivity {
 
         });
 
-        binding.loginBtn.setOnClickListener(view -> {
+        binding.signupBtn.setOnClickListener(view -> {
             binding.pgbarOverlay.setVisibility(View.VISIBLE);
             binding.pgbarOverlay.setAlpha(1f);
+
             String email, password;
 
             email = String.valueOf(binding.email.getText());
@@ -91,45 +92,42 @@ public class CustomerPage extends AppCompatActivity {
 
             if (TextUtils.isEmpty(email)){
                 binding.pgbarOverlay.setVisibility(View.GONE);
-                Toast.makeText(CustomerPage.this, "Email cannot be empty.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CustomerReg.this, "Email cannot be empty.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (TextUtils.isEmpty(password)){
                 binding.pgbarOverlay.setVisibility(View.GONE);
-                Toast.makeText(CustomerPage.this, "Password cannot be empty.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CustomerReg.this, "Password cannot be empty.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            mAuth.signInWithEmailAndPassword(email, password)
+            mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             new Handler().postDelayed(() -> {
-                            binding.pgbarOverlay.setVisibility(View.GONE);
+                                binding.pgbarOverlay.setVisibility(View.GONE);
 
-                            if (task.isSuccessful()) {
-                                Toast.makeText(CustomerPage.this, "Logged In Successfully.",
-                                        Toast.LENGTH_SHORT).show();
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(CustomerReg.this, "Account Successfully Created.",
+                                            Toast.LENGTH_SHORT).show();
 
-                                        Intent intent = new Intent(CustomerPage.this, UserPage.class);
-                                        CustomerPage.this.startActivity(intent);
 
-                                        finish();
 
-                            } else {
-                                binding.pgbarOverlay.setAlpha(0);
-                                binding.pgbarOverlay.setVisibility(View.VISIBLE);
+                                } else {
+                                    binding.pgbarOverlay.setAlpha(0);
+                                    binding.pgbarOverlay.setVisibility(View.VISIBLE);
 
-                                Toast.makeText(CustomerPage.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(CustomerReg.this, "Authentication failed.",
+                                            Toast.LENGTH_SHORT).show();
 
-                            }
+                                }
                             }, 1000);
                         }
                     });
 
         });
+
     }
 }
-
