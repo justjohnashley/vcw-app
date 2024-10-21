@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/browsemenu"
+    <item android:id="@+id/fragOne"
         android:icon="@drawable/baseline_search_24"
         android:title="Browse" />
 
-    <item android:id="@+id/profilemenu"
+    <item android:id="@+id/fragTwo"
+        android:icon="@drawable/baseline_history_24"
+        android:title="My Orders" />
+
+    <item android:id="@+id/fragThree"
         android:icon="@drawable/baseline_person_outline_24"
-        android:title="Profile" />
+        android:title="My Profile" />
+
 
 </menu>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cmnavbar"
+    app:startDestination="@id/fragOne">
+
+    <fragment
+        android:id="@+id/fragOne"
+        android:name="com.pural_ba3a.vulcanwash.FragOne"
+        android:label="frag_one"
+        tools:layout="@layout/frag_one" />
+    <fragment
+        android:id="@+id/fragTwo"
+        android:name="com.pural_ba3a.vulcanwash.FragTwo"
+        android:label="frag_two"
+        tools:layout="@layout/frag_two" />
+    <fragment
+        android:id="@+id/fragThree"
+        android:name="com.pural_ba3a.vulcanwash.FragThree"
+        android:label="frag_three"
+        tools:layout="@layout/frag_three" />
+</navigation>
