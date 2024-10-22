@@ -79,11 +79,29 @@ public class UserPage extends AppCompatActivity {
         });
     }
 
-    private void replaceFragment(Fragment fragment){
+
+
+    private void replaceFragment(Fragment fragment) {
         FragmentManager fragManager = getSupportFragmentManager();
         FragmentTransaction fragTrans = fragManager.beginTransaction();
+
+        // Find the existing fragment in the container (if any)
+        Fragment currentFragment = fragManager.findFragmentById(R.id.fragLayout);
+
+        if (currentFragment != null) {
+            // Option 1: Remove the current fragment
+            // fragTrans.remove(currentFragment);
+
+            // Option 2: Detach the current fragment
+            fragTrans.detach(currentFragment);
+        }
+
+        // Replace the fragment in the container
         fragTrans.replace(R.id.fragLayout, fragment);
+
+        // Commit the transaction
         fragTrans.commit();
     }
+
 }
 

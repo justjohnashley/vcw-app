@@ -76,10 +76,10 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/gray_border"
-                android:drawableLeft="@drawable/baseline_person_24"
-                android:drawablePadding="8dp"
+                android:drawableRight="@drawable/baseline_person_24"
                 android:hint="Email"
-                android:padding="8dp" />
+                android:paddingStart="12dp"
+                android:padding="6dp" />
 
             <EditText
                 android:id="@+id/password"
@@ -87,11 +87,11 @@
                 android:layout_height="50dp"
                 android:layout_marginBottom="5dp"
                 android:background="@drawable/gray_border"
-                android:drawableLeft="@drawable/baseline_lock_24"
-                android:drawablePadding="8dp"
+                android:drawableRight="@drawable/baseline_lock_24"
                 android:hint="Password"
+                android:paddingStart="12dp"
                 android:inputType="textPassword"
-                android:padding="8dp" />
+                android:padding="6dp" />
 
             <LinearLayout
                 android:id="@+id/linearLayout"

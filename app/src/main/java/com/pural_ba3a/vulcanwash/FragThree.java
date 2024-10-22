@@ -18,7 +18,7 @@ import com.pural_ba3a.vulcanwash.databinding.FragThreeBinding;
 
 public class FragThree extends Fragment {
 
-
+    NetworkMonitor networkMonitor;
 
     FragThreeBinding binding;
     FirebaseAuth mAuth;
@@ -32,9 +32,7 @@ public class FragThree extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
-
-        mAuth = FirebaseAuth.getInstance();
-        user = mAuth.getCurrentUser();
+        networkMonitor = new NetworkMonitor(getContext());
 
         if (user != null) {
             binding.userid.setText(user.getEmail());
@@ -54,20 +52,34 @@ public class FragThree extends Fragment {
 
         });
 
+        binding.chpwBtn.setOnClickListener(view -> {
+            Intent intent = new Intent(getContext(), ChangePw.class);
+            startActivity(intent);
+
+        });
+
 
         binding.logoutBtn.setOnClickListener(view -> {
-            binding.pgbarOverlay.setAlpha(1f);
+            if (networkMonitor.isNetworkAvailable()) {
+                // Network is available, proceed with sign-out
+                binding.pgbarOverlay.setAlpha(1f);
 
-            new Handler().postDelayed(() -> {
-                binding.pgbarOverlay.setVisibility(view.GONE);
-                mAuth.signOut();
+                new Handler().postDelayed(() -> {
+                    binding.pgbarOverlay.setVisibility(View.GONE);
+                    mAuth.signOut();  // Sign out the user
 
-                Toast.makeText(requireContext(), "Logged out Successfully", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(requireActivity(), CustomerPage.class);
-                startActivity(intent);
-                getActivity().finish();
-            }, 2000);
+                    Toast.makeText(getContext(), "Logged out Successfully", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getContext(), CustomerPage.class);
+                    startActivity(intent);
+                    getActivity().finish();  // Finish the current activity
+                }, 2000);
+            } else {
+                // No network, show an error message
+                Toast.makeText(getContext(), "No internet connection. Please connect to the internet to log out.", Toast.LENGTH_LONG).show();
+            }
         });
+
+
 
         return binding.getRoot();
 
@@ -76,6 +88,8 @@ public class FragThree extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        // Unregister the network callback when the fragment or activity is destroyed
         binding = null;
+        networkMonitor.unregisterCallback();
     }
 }

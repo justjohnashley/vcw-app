@@ -15,6 +15,12 @@
 
     </style>
 
+    <style name="custom_cv_style2" parent="Widget.MaterialComponents.CardView">
+
+        <item name="shapeAppearanceOverlay">@style/custom_cardview2</item>
+
+    </style>
+
     <style name="custom_cardview" parent="">
 
         <item name="cornerFamily">rounded</item>
@@ -22,5 +28,24 @@
         <item name="cornerSizeTopLeft">20dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="custom_cardview2" parent="">
+
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">20dp</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeBottomRight">20dp</item>
+        <item name="cornerSizeBottomLeft">20dp</item>
+    </style>
+
+    <style name="custom_indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+
+        <item name="itemActiveIndicatorStyle">@style/App.Custom.Indicator</item>
+
+    </style>
+
+    <style name="App.Custom.Indicator" parent="">
+        <item name="android:color">@color/lighterblue</item>
     </style>
 </resources>

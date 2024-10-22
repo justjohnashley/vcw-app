@@ -124,7 +124,7 @@ public class CustomerPage extends AppCompatActivity {
                                 Toast.makeText(CustomerPage.this, "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
 
-                            }
+                                }
                             }, 1000);
                         }
                     });
