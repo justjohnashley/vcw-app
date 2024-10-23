@@ -104,6 +104,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
+                    android:backgroundTint="@color/darkerblue"
                     android:text="CHANGE PASSWORD" />
 
                 <Button
@@ -111,6 +112,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
+                    android:backgroundTint="@color/lighterblue"
+                    android:textColor="@color/darkblue"
                     android:text="LOGOUT" />
 
             </LinearLayout>

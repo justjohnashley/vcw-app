@@ -103,5 +103,9 @@ public class UserPage extends AppCompatActivity {
         fragTrans.commit();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 }
 
