@@ -22,17 +22,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.pural_ba3a.vulcanwash.databinding.ManagerPgBinding;
+import com.pural_ba3a.vulcanwash.databinding.CustomerRegBinding;
+import com.pural_ba3a.vulcanwash.databinding.ManagerRegBinding;
 
-public class ManagerPage extends AppCompatActivity {
+import java.util.HashMap;
+import java.util.Map;
 
-    ManagerPgBinding binding;
+public class ManagerReg extends AppCompatActivity {
+
+    ManagerRegBinding binding;
     FirebaseAuth mAuth;
     FirebaseFirestore firestore;
-    FirebaseUser user;
-    DocumentReference docRef;
     NetworkMonitor networkMonitor;
 
     @Override
@@ -52,9 +53,10 @@ public class ManagerPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         mAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
         networkMonitor = new NetworkMonitor(getApplicationContext());
 
-        binding = ManagerPgBinding.inflate(getLayoutInflater());
+        binding = ManagerRegBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -65,23 +67,22 @@ public class ManagerPage extends AppCompatActivity {
 
         binding.backBtn.setOnClickListener(view -> {
 
-            Intent intent = new Intent(ManagerPage.this, HomePage.class);
-            ManagerPage.this.startActivity(intent);
+            Intent intent = new Intent(ManagerReg.this, HomePage.class);
+            startActivity(intent);
 
             finish();
 
         });
 
-        binding.signup.setOnClickListener(view -> {
+        binding.login.setOnClickListener(view -> {
 
-            Intent intent = new Intent(ManagerPage.this, ManagerReg.class);
-            ManagerPage.this.startActivity(intent);
+            Intent intent = new Intent(ManagerReg.this, ManagerPage.class);
+            startActivity(intent);
 
             finish();
 
 
         });
-
 
         Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.vcw_loading);
         binding.loadingVideoView.setVideoURI(videoUri);
@@ -117,7 +118,7 @@ public class ManagerPage extends AppCompatActivity {
             public void afterTextChanged(Editable s) { }
         });
 
-        binding.loginBtn.setOnClickListener(view -> {
+        binding.signupBtn.setOnClickListener(view -> {
             binding.pgbarOverlay.setVisibility(View.VISIBLE);
             binding.pgbarOverlay.setAlpha(1f);
 
@@ -126,7 +127,8 @@ public class ManagerPage extends AppCompatActivity {
                     String email = binding.email.getText().toString().trim();
                     String password = binding.password.getText().toString().trim();
 
-                    mAuth.signInWithEmailAndPassword(email, password)
+
+                    mAuth.createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -134,38 +136,33 @@ public class ManagerPage extends AppCompatActivity {
                                         binding.pgbarOverlay.setVisibility(View.GONE);
 
                                         if (task.isSuccessful()) {
-                                            user = mAuth.getCurrentUser();
-
+                                            FirebaseUser user = mAuth.getCurrentUser();
                                             if (user != null) {
                                                 String uid = user.getUid();
-                                                firestore = FirebaseFirestore.getInstance();
-                                                docRef = firestore.collection("users").document(uid);
-                                                docRef.get().addOnCompleteListener(task1 -> {
-                                                    if (task1.isSuccessful() && task1.getResult() != null) {
-                                                        String userType = task1.getResult().getString("usertype");
 
-                                                        // Check if usertype is "customer"
-                                                        if ("manager".equals(userType)) {
-                                                            // Proceed to user page
-                                                            Toast.makeText(ManagerPage.this, "Logged In Successfully.", Toast.LENGTH_SHORT).show();
-                                                            Intent intent = new Intent(ManagerPage.this, AdminPage.class);
-                                                            ManagerPage.this.startActivity(intent);
-                                                            finish();
-                                                        } else {
-                                                            // Incorrect usertype; prevent login
-                                                            Toast.makeText(ManagerPage.this, "Access denied.", Toast.LENGTH_LONG).show();
-                                                            mAuth.signOut();
-                                                        }
-                                                    } else {
-                                                        // Error retrieving document or usertype field missing
-                                                        Toast.makeText(ManagerPage.this, "Error checking user type. Please try again.", Toast.LENGTH_LONG).show();
-                                                    }
-                                                });
+                                                // Create the customer data to save
+                                                Map<String, Object> managerData = new HashMap<>();
+                                                managerData.put("uid", uid);
+                                                managerData.put("usertype", "manager");
+
+                                                // Save the data in Firestore
+                                                firestore.collection("users").document(uid)
+                                                        .set(managerData)
+                                                        .addOnCompleteListener(task1 -> {
+                                                            if (task1.isSuccessful()) {
+                                                                Toast.makeText(ManagerReg.this, "Account created successfully.", Toast.LENGTH_SHORT).show();
+                                                                Intent intent = new Intent(ManagerReg.this, AdminInfo.class);
+                                                                startActivity(intent);
+                                                                finish();
+                                                            } else {
+                                                                Toast.makeText(ManagerReg.this, "Failed to create Firestore entry.", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
                                             }
                                         } else {
                                             binding.pgbarOverlay.setAlpha(0);
                                             binding.pgbarOverlay.setVisibility(View.VISIBLE);
-                                            Toast.makeText(ManagerPage.this, "Authentication failed. Double check your credentials.", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(ManagerReg.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                                         }
                                     }, 1000);
                                 }
@@ -174,11 +171,10 @@ public class ManagerPage extends AppCompatActivity {
                     binding.pgbarOverlay.setVisibility(View.GONE);
                 }
             } else {
-                binding.pgbarOverlay.setVisibility(View.GONE);
-                Toast.makeText(this, "No internet connection. Please connect to internet to proceed.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "No internet connection. Please connect to the internet to proceed with this request.", Toast.LENGTH_LONG).show();
             }
-
         });
+
     }
 
     // Real-time email validation
@@ -242,13 +238,5 @@ public class ManagerPage extends AppCompatActivity {
             }
         }
         return false;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        // Unregister the network callback when the fragment or activity is destroyed
-        binding = null;
-        networkMonitor.unregisterCallback();
     }
 }

@@ -8,7 +8,7 @@
     android:background="@drawable/bg_gradient"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".ManagerPage">
+    tools:context=".ManagerReg">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -78,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="Login"
+                    android:text="Register"
                     android:textAlignment="center"
                     android:textSize="32sp"
                     android:textStyle="bold" />
@@ -122,18 +122,18 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="Don't have an account? "
+                        android:text="Already have an account? "
                         android:textColor="#5C5C5C"
                         android:textSize="15dp" />
 
 
                     <TextView
-                        android:id="@+id/signup"
+                        android:id="@+id/login"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="Register now."
+                        android:text="Login"
                         android:clickable="true"
                         android:textColor="@color/darkblue"
                         android:textSize="15dp" />
@@ -141,13 +141,13 @@
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/loginBtn"
+                    android:id="@+id/signupBtn"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:layout_marginLeft="15dp"
                     android:layout_marginRight="15dp"
                     android:layout_marginBottom="8dp"
-                    android:text="LOGIN"
+                    android:text="SIGN UP"
                     android:textSize="16dp"
                     android:textStyle="bold"
                     tools:layout_editor_absoluteX="261dp"
@@ -216,6 +216,5 @@
         </androidx.cardview.widget.CardView>
 
     </FrameLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

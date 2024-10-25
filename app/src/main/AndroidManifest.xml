@@ -16,6 +16,15 @@
         android:theme="@style/Theme.VulCANWash"
         tools:targetApi="31">
         <activity
+            android:name=".AdminInfo"
+            android:exported="false" />
+        <activity
+            android:name=".AdminPage"
+            android:exported="false" />
+        <activity
+            android:name=".ManagerReg"
+            android:exported="false" />
+        <activity
             android:name=".ChangePw"
             android:exported="false" />
         <activity

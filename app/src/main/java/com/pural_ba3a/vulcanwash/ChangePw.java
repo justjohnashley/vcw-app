@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
 
@@ -52,13 +54,41 @@ public class ChangePw extends AppCompatActivity {
 
         });
 
+        binding.oldpw.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validatePassword2();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
+        binding.newpw.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validatePassword();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
 
         binding.checkBtn.setOnClickListener(v -> {
             if (networkMonitor.isNetworkAvailable()) {
+                binding.pgbarOverlay.setVisibility(View.VISIBLE);
             binding.pgbarOverlay.setAlpha(1f);
 
-            String currentPassword = binding.oldpw.getText().toString();
-            String newPassword = binding.newpw.getText().toString();
+                if (validatePassword()) {
+                    String currentPassword = binding.oldpw.getText().toString().trim();
+                    String newPassword = binding.newpw.getText().toString().trim();
 
             new Handler().postDelayed(() -> {
             if (!currentPassword.isEmpty() && !newPassword.isEmpty()) {
@@ -69,9 +99,12 @@ public class ChangePw extends AppCompatActivity {
                 Toast.makeText(ChangePw.this, "Please fill in all fields.", Toast.LENGTH_SHORT).show();
             }
             }, 2000);
+                } else {
+                    binding.pgbarOverlay.setVisibility(View.GONE);
+                }
             } else {
-                // No network, show an error message
-                Toast.makeText(this, "No internet connection. Please connect to the internet to proceed with this request.", Toast.LENGTH_LONG).show();
+                binding.pgbarOverlay.setVisibility(View.GONE);
+                Toast.makeText(this, "No internet connection. Please connect to the internet to proceed.", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -125,11 +158,65 @@ public class ChangePw extends AppCompatActivity {
                     });
                     }, 1000);
                 } else {
-                    // Re-authentication failed
+                    binding.pgbarOverlay.setVisibility(View.GONE);
                     Toast.makeText(ChangePw.this, "Re-authentication failed. Please check your current password.", Toast.LENGTH_SHORT).show();
                 }
             });
         }
+    }
+
+    // Real-time password validation
+    private boolean validatePassword() {
+        String password = binding.newpw.getText().toString().trim();
+        if (password.isEmpty()) {
+            binding.newpw.setBackgroundResource(R.drawable.border_error);
+            binding.newpw.setError("Password cannot be empty.");
+            return false;
+        } else if (!isValidPassword(password)) {
+            binding.newpw.setBackgroundResource(R.drawable.border_error);
+            binding.newpw.setError("Password must be at least 8 characters and contain letters and numbers.");
+            return false;
+        } else {
+            binding.newpw.setError(null);
+            binding.newpw.setBackgroundResource(R.drawable.border_success);
+            // Clear the error
+            return true;
+        }
+    }
+
+    private boolean validatePassword2() {
+        String password = binding.oldpw.getText().toString().trim();
+        if (password.isEmpty()) {
+            binding.oldpw.setBackgroundResource(R.drawable.border_error);
+            binding.oldpw.setError("Password cannot be empty.");
+            return false;
+        } else {
+            binding.oldpw.setError(null);
+            binding.oldpw.setBackgroundResource(R.drawable.border_success);
+            // Clear the error
+            return true;
+        }
+    }
+
+    private boolean isValidPassword(String password) {
+        // Password must be at least 8 characters and contain both letters and numbers
+        if (password.length() < 8) {
+            return false;
+        }
+        boolean hasLetter = false;
+        boolean hasDigit = false;
+        for (char c : password.toCharArray()) {
+            if (Character.isLetter(c)) {
+                hasLetter = true;
+            }
+            if (Character.isDigit(c)) {
+                hasDigit = true;
+            }
+            if (hasLetter && hasDigit) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

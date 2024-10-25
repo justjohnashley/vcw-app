@@ -23,12 +23,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.pural_ba3a.vulcanwash.databinding.CustomerPgBinding;
 
 public class CustomerPage extends AppCompatActivity {
 
     CustomerPgBinding binding;
     FirebaseAuth mAuth;
+    FirebaseFirestore firestore;
+    FirebaseUser user;
+    DocumentReference docRef;
     NetworkMonitor networkMonitor;
 
     @Override
@@ -68,7 +73,7 @@ public class CustomerPage extends AppCompatActivity {
 
         });
 
-        binding.csignup.setOnClickListener(view -> {
+        binding.signup.setOnClickListener(view -> {
 
             Intent intent = new Intent(CustomerPage.this, CustomerReg.class);
             CustomerPage.this.startActivity(intent);
@@ -129,22 +134,39 @@ public class CustomerPage extends AppCompatActivity {
                             binding.pgbarOverlay.setVisibility(View.GONE);
 
                             if (task.isSuccessful()) {
-                                Toast.makeText(CustomerPage.this, "Logged In Successfully.",
-                                        Toast.LENGTH_SHORT).show();
+                                user = mAuth.getCurrentUser();
 
-                                        Intent intent = new Intent(CustomerPage.this, UserPage.class);
-                                        CustomerPage.this.startActivity(intent);
+                                if (user != null) {
+                                    String uid = user.getUid();
+                                    firestore = FirebaseFirestore.getInstance();
+                                    docRef = firestore.collection("users").document(uid);
+                                    docRef.get().addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful() && task1.getResult() != null) {
+                                            String userType = task1.getResult().getString("usertype");
 
-                                        finish();
-
+                                            // Check if usertype is "customer"
+                                            if ("customer".equals(userType)) {
+                                                // Proceed to user page
+                                                Toast.makeText(CustomerPage.this, "Logged In Successfully.", Toast.LENGTH_SHORT).show();
+                                                Intent intent = new Intent(CustomerPage.this, UserPage.class);
+                                                CustomerPage.this.startActivity(intent);
+                                                finish();
+                                            } else {
+                                                // Incorrect usertype; prevent login
+                                                Toast.makeText(CustomerPage.this, "Access denied.", Toast.LENGTH_LONG).show();
+                                                mAuth.signOut();
+                                            }
+                                        } else {
+                                            // Error retrieving document or usertype field missing
+                                            Toast.makeText(CustomerPage.this, "Error checking user type. Please try again.", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
                             } else {
                                 binding.pgbarOverlay.setAlpha(0);
                                 binding.pgbarOverlay.setVisibility(View.VISIBLE);
-
-                                Toast.makeText(CustomerPage.this, "Authentication failed. Double check your credentials.",
-                                        Toast.LENGTH_LONG).show();
-
-                                }
+                                Toast.makeText(CustomerPage.this, "Authentication failed. Double check your credentials.", Toast.LENGTH_LONG).show();
+                            }
                             }, 1000);
                         }
                     });
@@ -153,7 +175,7 @@ public class CustomerPage extends AppCompatActivity {
             }
                 } else {
                 binding.pgbarOverlay.setVisibility(View.GONE);
-                    Toast.makeText(this, "No internet connection. Please connect to the internet to proceed with this request.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "No internet connection. Please connect to internet to proceed.", Toast.LENGTH_LONG).show();
                 }
 
         });

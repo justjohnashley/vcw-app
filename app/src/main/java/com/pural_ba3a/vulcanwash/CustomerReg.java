@@ -25,12 +25,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.pural_ba3a.vulcanwash.databinding.CustomerRegBinding;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CustomerReg extends AppCompatActivity {
 
     CustomerRegBinding binding;
     FirebaseAuth mAuth;
+    FirebaseFirestore firestore;
     NetworkMonitor networkMonitor;
 
     @Override
@@ -50,6 +55,7 @@ public class CustomerReg extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         mAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
         networkMonitor = new NetworkMonitor(getApplicationContext());
 
         binding = CustomerRegBinding.inflate(getLayoutInflater());
@@ -70,7 +76,7 @@ public class CustomerReg extends AppCompatActivity {
 
         });
 
-        binding.clogin.setOnClickListener(view -> {
+        binding.login.setOnClickListener(view -> {
 
             Intent intent = new Intent(CustomerReg.this, CustomerPage.class);
             CustomerReg.this.startActivity(intent);
@@ -124,39 +130,51 @@ public class CustomerReg extends AppCompatActivity {
                         String password = binding.password.getText().toString().trim();
 
 
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            new Handler().postDelayed(() -> {
-                                binding.pgbarOverlay.setVisibility(View.GONE);
+                        mAuth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        new Handler().postDelayed(() -> {
+                                            binding.pgbarOverlay.setVisibility(View.GONE);
 
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(CustomerReg.this, "Account Successfully Created.",
-                                            Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(CustomerReg.this, CustomerPage.class);
-                                    CustomerReg.this.startActivity(intent);
-                                    finish();
-                                    Toast.makeText(CustomerReg.this, "Proceed to Login.",
-                                            Toast.LENGTH_SHORT).show();
-                                } else {
-                                    binding.pgbarOverlay.setAlpha(0);
-                                    binding.pgbarOverlay.setVisibility(View.VISIBLE);
+                                            if (task.isSuccessful()) {
+                                                FirebaseUser user = mAuth.getCurrentUser();
+                                                if (user != null) {
+                                                    String uid = user.getUid();
 
-                                    Toast.makeText(CustomerReg.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
+                                                    // Create the customer data to save
+                                                    Map<String, Object> customerData = new HashMap<>();
+                                                    customerData.put("uid", uid);
+                                                    customerData.put("usertype", "customer");
 
-                                }
-                            }, 1000);
-                        }
-                    });
+                                                    // Save the data in Firestore
+                                                    firestore.collection("users").document(uid)
+                                                            .set(customerData)
+                                                            .addOnCompleteListener(task1 -> {
+                                                                if (task1.isSuccessful()) {
+                                                                    Toast.makeText(CustomerReg.this, "Account created successfully.", Toast.LENGTH_SHORT).show();
+                                                                    Intent intent = new Intent(CustomerReg.this, CustomerPage.class);
+                                                                    CustomerReg.this.startActivity(intent);
+                                                                    finish();
+                                                                } else {
+                                                                    Toast.makeText(CustomerReg.this, "Failed to create Firestore entry.", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            });
+                                                }
+                                            } else {
+                                                binding.pgbarOverlay.setAlpha(0);
+                                                binding.pgbarOverlay.setVisibility(View.VISIBLE);
+                                                Toast.makeText(CustomerReg.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }, 1000);
+                                    }
+                                });
                     } else {
                         binding.pgbarOverlay.setVisibility(View.GONE);
                     }
-                    } else {
-                        // No network, show an error message
-                        Toast.makeText(this, "No internet connection. Please connect to the internet to proceed with this request.", Toast.LENGTH_LONG).show();
-                    }
+            } else {
+                Toast.makeText(this, "No internet connection. Please connect to the internet to proceed with this request.", Toast.LENGTH_LONG).show();
+            }
         });
 
     }
