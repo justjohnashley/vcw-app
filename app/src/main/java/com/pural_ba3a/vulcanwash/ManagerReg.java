@@ -121,7 +121,8 @@ public class ManagerReg extends AppCompatActivity {
         binding.signupBtn.setOnClickListener(view -> {
             binding.pgbarOverlay.setVisibility(View.VISIBLE);
             binding.pgbarOverlay.setAlpha(1f);
-
+            binding.pgbarOverlay.setClickable(true);
+            binding.pgbarOverlay.setFocusable(true);
             if (networkMonitor.isNetworkAvailable()) {
                 if (validateEmail() && validatePassword()) {
                     String email = binding.email.getText().toString().trim();
@@ -134,6 +135,8 @@ public class ManagerReg extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     new Handler().postDelayed(() -> {
                                         binding.pgbarOverlay.setVisibility(View.GONE);
+                                        binding.pgbarOverlay.setClickable(false);
+                                        binding.pgbarOverlay.setFocusable(false);
 
                                         if (task.isSuccessful()) {
                                             FirebaseUser user = mAuth.getCurrentUser();

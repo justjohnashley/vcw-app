@@ -15,12 +15,14 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.pural_ba3a.vulcanwash.databinding.FragThreeBinding;
+import com.pural_ba3a.vulcanwash.databinding.FragThreeadminBinding;
 
-public class FragThree extends Fragment {
+
+public class FragThreeAdmin extends Fragment {
 
     NetworkMonitor networkMonitor;
 
-    FragThreeBinding binding;
+    FragThreeadminBinding binding;
     FirebaseAuth mAuth;
     FirebaseUser user;
 
@@ -28,7 +30,7 @@ public class FragThree extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        binding = FragThreeBinding.inflate(getLayoutInflater(), container, false);
+        binding = FragThreeadminBinding.inflate(getLayoutInflater(), container, false);
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -58,7 +60,6 @@ public class FragThree extends Fragment {
 
         });
 
-
         binding.logoutBtn.setOnClickListener(view -> {
             if (networkMonitor.isNetworkAvailable()) {
                 // Network is available, proceed with sign-out
@@ -83,17 +84,6 @@ public class FragThree extends Fragment {
             }
         });
 
-
-
         return binding.getRoot();
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        // Unregister the network callback when the fragment or activity is destroyed
-        binding = null;
-        networkMonitor.unregisterCallback();
     }
 }

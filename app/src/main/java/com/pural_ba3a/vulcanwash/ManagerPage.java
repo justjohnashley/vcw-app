@@ -120,6 +120,8 @@ public class ManagerPage extends AppCompatActivity {
         binding.loginBtn.setOnClickListener(view -> {
             binding.pgbarOverlay.setVisibility(View.VISIBLE);
             binding.pgbarOverlay.setAlpha(1f);
+            binding.pgbarOverlay.setClickable(true);
+            binding.pgbarOverlay.setFocusable(true);
 
             if (networkMonitor.isNetworkAvailable()) {
                 if (validateEmail() && validatePassword()) {
@@ -132,6 +134,8 @@ public class ManagerPage extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     new Handler().postDelayed(() -> {
                                         binding.pgbarOverlay.setVisibility(View.GONE);
+                                        binding.pgbarOverlay.setClickable(false);
+                                        binding.pgbarOverlay.setFocusable(false);
 
                                         if (task.isSuccessful()) {
                                             user = mAuth.getCurrentUser();
