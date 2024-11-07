@@ -20,15 +20,20 @@
             android:layout_height="wrap_content"
             android:text="Please fill out the following."
             android:textStyle="bold"
+            android:layout_marginBottom="6dp"
             />
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/shopnameLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
+            app:boxStrokeWidth="2dp"
+            app:boxBackgroundMode="outline"
             >
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/shopname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="What is your Shop's Name?"
@@ -37,11 +42,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/streetLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp">
+            android:layout_marginBottom="6dp"
+            app:boxStrokeWidth="2dp"
+            app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/street"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Street No./Name"
@@ -50,11 +59,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/brgyLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp">
+            android:layout_marginBottom="6dp"
+            app:boxStrokeWidth="2dp"
+            app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/brgy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Barangay"
@@ -63,11 +76,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/cityLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp">
+            android:layout_marginBottom="6dp"
+            app:boxStrokeWidth="2dp"
+            app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="City/Municipality"
@@ -76,11 +93,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/provLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="6dp">
+            android:layout_marginBottom="6dp"
+            app:boxStrokeWidth="2dp"
+            app:boxBackgroundMode="outline">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/prov"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Province"
@@ -94,11 +115,13 @@
             android:orientation="horizontal">
 
             <CheckBox
+                android:id="@+id/tnc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="I agree to the "/>
 
             <TextView
+                android:id="@+id/tncBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Terms and Conditions"
@@ -108,8 +131,10 @@
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/submitBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:text="SUBMIT"/>
 
     </LinearLayout>

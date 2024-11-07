@@ -3,6 +3,8 @@ package com.pural_ba3a.vulcanwash;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
+    NetworkMonitor networkMonitor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
+        networkMonitor = new NetworkMonitor(this);
+
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -42,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Get the current user
         currentUser = mAuth.getCurrentUser();
-
+        if (networkMonitor.isNetworkAvailable()) {
         if (currentUser != null) {
             // If user is logged in, check user type
             checkUserTypeAndNavigate();
@@ -53,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }, 1000);
+        }
+        } else {
+            Snackbar netSnackbar = Snackbar.make(binding.getRoot(), "You do not have internet connection. Please connect to the internet to proceed.", Snackbar.LENGTH_INDEFINITE);
+            netSnackbar.show();
         }
     }
 
@@ -81,6 +91,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                     }, 1000);
                 });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
     }
 
     @Override

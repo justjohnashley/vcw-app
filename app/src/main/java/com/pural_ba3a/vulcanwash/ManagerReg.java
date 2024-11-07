@@ -147,6 +147,7 @@ public class ManagerReg extends AppCompatActivity {
                                                 Map<String, Object> managerData = new HashMap<>();
                                                 managerData.put("uid", uid);
                                                 managerData.put("usertype", "manager");
+                                                managerData.put("status","pending");
 
                                                 // Save the data in Firestore
                                                 firestore.collection("users").document(uid)

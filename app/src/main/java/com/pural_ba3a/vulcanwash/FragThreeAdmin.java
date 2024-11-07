@@ -74,7 +74,7 @@ public class FragThreeAdmin extends Fragment {
                     mAuth.signOut();  // Sign out the user
 
                     Toast.makeText(getContext(), "Logged out Successfully", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getContext(), CustomerPage.class);
+                    Intent intent = new Intent(getContext(), ManagerPage.class);
                     startActivity(intent);
                     getActivity().finish();  // Finish the current activity
                 }, 2000);

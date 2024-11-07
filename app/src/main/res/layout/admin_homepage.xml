@@ -34,12 +34,12 @@
                 android:background="@drawable/bg_rounded2"
                 android:elevation="6dp"
                 app:labelVisibilityMode="selected"
-                app:itemRippleColor="@color/lighterblue"
+                app:itemRippleColor="@color/white"
                 app:itemActiveIndicatorStyle="@color/transparent"
                 app:itemTextColor="@color/darkblue"
                 app:itemIconSize="32dp"
                 app:itemIconTint="@color/navcolor2"
-                app:menu="@menu/nav_menu" />
+                app:menu="@menu/nav_menu2" />
 
 
 

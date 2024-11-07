@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/fragOneAdmin"
+        android:icon="@drawable/baseline_storefront_24"
+        android:title="Shop" />
+
+    <item android:id="@+id/fragTwoAdmin"
+        android:icon="@drawable/baseline_history_24"
+        android:title="Orders" />
+
+    <item android:id="@+id/fragThreeAdmin"
+        android:icon="@drawable/baseline_info_outline_24"
+        android:title="Profile" />
+
+
+</menu>

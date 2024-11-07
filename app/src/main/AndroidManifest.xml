@@ -16,6 +16,9 @@
         android:theme="@style/Theme.VulCANWash"
         tools:targetApi="31">
         <activity
+            android:name=".PendingPage"
+            android:exported="false" />
+        <activity
             android:name=".AdminInfo"
             android:exported="false" />
         <activity
