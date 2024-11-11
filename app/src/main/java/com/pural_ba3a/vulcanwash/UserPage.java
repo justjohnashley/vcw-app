@@ -63,44 +63,43 @@ public class UserPage extends AppCompatActivity {
 
 
 
-        replaceFragment(new FragOne());
+        // Show initial fragment
+        showFragment(new FragOne(), "FRAG_ONE");
 
+        // Set up navigation bar listener for fragment switching
         binding.btnvbar.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.fragOne) {
-                replaceFragment(new FragOne());
-            }
-            else if (item.getItemId() == R.id.fragTwo) {
-                replaceFragment(new FragTwo());
-            }
-            else if (item.getItemId() == R.id.fragThree) {
-                replaceFragment(new FragThree());
+                showFragment(new FragOne(), "FRAG_ONE");
+            } else if (item.getItemId() == R.id.fragTwo) {
+                showFragment(new FragTwo(), "FRAG_TWO");
+            } else if (item.getItemId() == R.id.fragThree) {
+                showFragment(new FragThree(), "FRAG_THREE");
             }
             return true;
         });
     }
 
+    // Optimized method to show fragments without re-creating them
+    private void showFragment(Fragment fragment, String tag) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-
-    private void replaceFragment(Fragment fragment) {
-        FragmentManager fragManager = getSupportFragmentManager();
-        FragmentTransaction fragTrans = fragManager.beginTransaction();
-
-        // Find the existing fragment in the container (if any)
-        Fragment currentFragment = fragManager.findFragmentById(R.id.fragLayout);
-
-        if (currentFragment != null) {
-            // Option 1: Remove the current fragment
-            // fragTrans.remove(currentFragment);
-
-            // Option 2: Detach the current fragment
-            fragTrans.detach(currentFragment);
+        // Hide all other fragments
+        for (Fragment existingFragment : fragmentManager.getFragments()) {
+            transaction.hide(existingFragment);
         }
 
-        // Replace the fragment in the container
-        fragTrans.replace(R.id.fragLayout, fragment);
+        Fragment existingFragment = fragmentManager.findFragmentByTag(tag);
 
-        // Commit the transaction
-        fragTrans.commit();
+        if (existingFragment == null) {
+            // Add the fragment if it doesn't already exist in the back stack
+            transaction.add(R.id.fragLayout, fragment, tag);
+        } else {
+            // Show the fragment if it already exists
+            transaction.show(existingFragment);
+        }
+
+        transaction.commit();
     }
 
     @Override

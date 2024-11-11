@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">VulCANWash</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+        <string name="booking_title">Booking Confirmation</string>
+        <string name="booking_message">Would you like to book at %1$s?</string> <!-- %1$s will be replaced by shop name -->
+        <string name="cancel">Cancel</string>
+        <string name="decline">Decline</string>
+        <string name="accept">Accept</string>
+
+
 </resources>

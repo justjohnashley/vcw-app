@@ -3,6 +3,7 @@ package com.pural_ba3a.vulcanwash;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -46,6 +47,13 @@ public class AdminInfo extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.vcw_loading);
+        binding.loadingVideoView.setVideoURI(videoUri);
+        binding.loadingVideoView.setOnPreparedListener(mp -> {
+            mp.setLooping(true);
+            binding.loadingVideoView.start();
         });
 
         binding.tnc.setOnCheckedChangeListener((buttonView, isChecked) -> {

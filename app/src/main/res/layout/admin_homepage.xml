@@ -71,16 +71,12 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
-
-
     <FrameLayout
         android:id="@+id/pgbarOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0"
-        android:background="#80000000"
-        android:visibility="gone">
+        android:background="#80000000">
 
         <androidx.cardview.widget.CardView
             android:layout_width="50dp"

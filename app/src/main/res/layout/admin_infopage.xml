@@ -139,4 +139,28 @@
 
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/pgbarOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="#80000000">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            app:cardCornerRadius="12dp">
+
+            <VideoView
+                android:id="@+id/loadingVideoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop" />
+
+        </androidx.cardview.widget.CardView>
+
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
