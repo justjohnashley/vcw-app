@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text=" vcw.business@email.com"
+            android:text="vcwash.app@gmail.com"
             android:textColor="@color/darkblue"
             android:textSize="15dp" />
 

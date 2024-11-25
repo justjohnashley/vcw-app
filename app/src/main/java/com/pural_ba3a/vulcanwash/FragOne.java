@@ -50,6 +50,7 @@ public class FragOne extends Fragment {
 
         return binding.getRoot();
     }
+
     private void loadShops() {
 
         new Handler().postDelayed(() -> {

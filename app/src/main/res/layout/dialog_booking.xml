@@ -1,36 +1,165 @@
-<!-- dialog_booking.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/botsheet"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent"
+    android:padding="15dp">
 
-    <!-- Service Switches -->
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/switch_service1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Service 1" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="45dp"
+        android:animateLayoutChanges="true">
 
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/switch_service2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Service 2" />
+        <!-- Booking Title -->
 
-    <!-- Payment Method Radio Group -->
-    <RadioGroup
-        android:id="@+id/payment_radio_group"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        <!-- Booking Message -->
 
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/radio_cash"
+
+        <!-- Confirm Button -->
+
+        <!-- Cancel Button -->
+
+        <TextView
+            android:id="@+id/bookingTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:gravity="center"
+            android:text="Shop Name"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.371" />
+
+        <TextView
+            android:id="@+id/bookingMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:fontFamily="sans-serif-condensed-light"
+            android:gravity="center"
+            android:text="shop address"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bookingTitle"
+            app:layout_constraintVertical_bias="0.015" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/materialCardView7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cash" />
+            app:cardBackgroundColor="@color/black"
+            app:cardCornerRadius="24dp"
+            app:layout_constraintBottom_toTopOf="@+id/bookingTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="350dp"
+                android:layout_height="150dp"
+                android:layout_margin="6dp"
+                android:src="@drawable/vcw_iconwh" />
+
+        </com.google.android.material.card.MaterialCardView>
 
 
-    </RadioGroup>
-</LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/selectTimeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableRight="@drawable/baseline_access_time_filled_24"
+            android:text="Select Time"
+            app:cornerRadius="15dp"
+            app:layout_constraintBottom_toTopOf="@+id/confirmBookingButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bookingMessage"
+            app:layout_constraintVertical_bias="0.154" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/selectPaymentMethodButton"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Select Payment Method"
+            app:cornerRadius="15dp"
+            app:layout_constraintBottom_toTopOf="@+id/confirmBookingButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bookingMessage"
+            app:layout_constraintVertical_bias="0.154" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/confirmBookingButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Confirm"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bookingMessage"
+            app:layout_constraintVertical_bias="0.806" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancelBookingButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/darker_gray"
+            android:text="Cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/confirmBookingButton"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/selectServicesButton"
+            style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+            android:layout_width="330dp"
+            android:layout_height="130dp"
+            android:layout_margin="16dp"
+            android:drawableRight="@drawable/baseline_settings_24"
+            android:text="Pick a Service"
+            android:textSize="20sp"
+            app:cornerRadius="15dp"
+            app:layout_constraintBottom_toTopOf="@+id/confirmBookingButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/selectPaymentMethodButton"
+            app:layout_constraintVertical_bias="0.264" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="200dp"
+        android:layout_height="6dp"
+        android:layout_marginBottom="35dp"
+        app:cardBackgroundColor="@color/gray"
+        app:cardCornerRadius="24dp"
+        app:layout_anchor="@+id/constraintLayout2"
+        app:layout_anchorGravity="top|center">
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
