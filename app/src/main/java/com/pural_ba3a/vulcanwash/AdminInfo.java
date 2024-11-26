@@ -2,7 +2,6 @@ package com.pural_ba3a.vulcanwash;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,7 +10,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -23,6 +21,9 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import com.pural_ba3a.vulcanwash.databinding.AdminInfopageBinding;
 
 import java.util.HashMap;
@@ -34,7 +35,6 @@ public class AdminInfo extends AppCompatActivity {
     FirebaseUser currentUser;
     FirebaseAuth mAuth;
     FirebaseFirestore firestore;
-    NetworkMonitor networkMonitor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +43,14 @@ public class AdminInfo extends AppCompatActivity {
         binding = AdminInfopageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Handle window insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+        // Video setup
         Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.vcw_loading);
         binding.loadingVideoView.setVideoURI(videoUri);
         binding.loadingVideoView.setOnPreparedListener(mp -> {
@@ -56,11 +58,8 @@ public class AdminInfo extends AppCompatActivity {
             binding.loadingVideoView.start();
         });
 
-        binding.tnc.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // Enable the button only if the checkbox is checked
-            binding.submitBtn.setEnabled(isChecked);
-        });
-
+        // Terms & Conditions checkbox logic
+        binding.tnc.setOnCheckedChangeListener((buttonView, isChecked) -> binding.submitBtn.setEnabled(isChecked));
         binding.tncBtn.setOnClickListener(view -> showTermsDialog());
 
         // Attach TextWatchers for live validation
@@ -69,27 +68,24 @@ public class AdminInfo extends AppCompatActivity {
         setupTextWatcher(binding.brgy, binding.brgyLayout, "Barangay is required");
         setupTextWatcher(binding.city, binding.cityLayout, "City is required");
         setupTextWatcher(binding.prov, binding.provLayout, "Province is required");
+        setupPhoneNumberValidation(); // Attach phone number validation
 
+        // Submit button logic
         binding.submitBtn.setOnClickListener(view -> {
-            // Validate all fields before proceeding
             if (!validateAllFields()) return;
 
             currentUser = mAuth.getInstance().getCurrentUser();
             if (currentUser != null) {
                 String uid = currentUser.getUid();
-
-                // Create a Map to hold your data
                 Map<String, Object> data = new HashMap<>();
                 data.put("shopName", binding.shopname.getText().toString());
                 data.put("street", binding.street.getText().toString());
                 data.put("barangay", binding.brgy.getText().toString());
                 data.put("city", binding.city.getText().toString());
                 data.put("province", binding.prov.getText().toString());
+                data.put("contact", formatPhoneNumber(binding.contact.getText().toString()));
 
-                // Get reference to Firestore
                 firestore = FirebaseFirestore.getInstance();
-
-                // Add to Firestore under the user's UID subcollection
                 firestore.collection("users")
                         .document(uid)
                         .collection(uid)
@@ -118,10 +114,8 @@ public class AdminInfo extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.toString().trim().isEmpty()) {
                     layout.setError(errorMessage);
-                    layout.setBoxStrokeColor(ContextCompat.getColor(AdminInfo.this, R.color.gray));
                 } else {
                     layout.setError(null);
-                    layout.setBoxStrokeColor(ContextCompat.getColor(AdminInfo.this, R.color.green));
                 }
             }
 
@@ -130,13 +124,31 @@ public class AdminInfo extends AppCompatActivity {
         });
     }
 
-    // Method to validate all fields at once
+    // Phone number validation setup
+    private void setupPhoneNumberValidation() {
+        binding.contact.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String phoneNumber = s.toString().trim();
+                if (!isValidPhoneNumber(phoneNumber)) {
+                    binding.contactLayout.setError("Invalid phone number. Use format +63xxxxxxxxxx");
+                } else {
+                    binding.contactLayout.setError(null);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    // Validate all fields
     private boolean validateAllFields() {
         boolean isValid = true;
-        if (binding.shopname.getText().toString().trim().length() > 30) {
-            binding.shopnameLayout.setError("Shop name can't exceed 30 characters");
-            isValid = false;
-        }
+
         if (binding.shopname.getText().toString().trim().isEmpty()) {
             binding.shopnameLayout.setError("Shop name is required");
             isValid = false;
@@ -157,22 +169,44 @@ public class AdminInfo extends AppCompatActivity {
             binding.provLayout.setError("Province is required");
             isValid = false;
         }
+        if (!isValidPhoneNumber(binding.contact.getText().toString().trim())) {
+            binding.contactLayout.setError("Invalid phone number");
+            isValid = false;
+        }
+
         return isValid;
     }
 
+    // Show terms dialog
     private void showTermsDialog() {
-        // Create a dialog
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dgbox_tnc);
-
-        // Set up the terms text
-        TextView termsTextView = dialog.findViewById(R.id.termsTextView);
-
-        // Set up the close button
         Button closeButton = dialog.findViewById(R.id.closeButton);
         closeButton.setOnClickListener(v -> dialog.dismiss());
-
-        // Show the dialog
         dialog.show();
+    }
+
+    // Validate phone number with libphonenumber
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        try {
+            Phonenumber.PhoneNumber parsedNumber = phoneUtil.parse(phoneNumber, "PH");
+            return phoneUtil.isValidNumber(parsedNumber);
+        } catch (NumberParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Format phone number to international format
+    private String formatPhoneNumber(String phoneNumber) {
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        try {
+            Phonenumber.PhoneNumber parsedNumber = phoneUtil.parse(phoneNumber, "PH");
+            return phoneUtil.format(parsedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
+        } catch (NumberParseException e) {
+            e.printStackTrace();
+            return phoneNumber;
+        }
     }
 }

@@ -24,6 +24,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,86 +89,117 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
 
                         holder.bookButton.setOnClickListener(view -> {
                             if (isOpen != null && isOpen) {
-                                // Create the BottomSheetDialog
-                                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
+                                // Fetch the shop's address
+                                fetchShopInfo(shopUid, (address, contactNumber) -> {
+                                    // Create the BottomSheetDialog
+                                    BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
 
-                                // Inflate the bottom sheet layout
-                                View bottomSheetView = LayoutInflater.from(context).inflate(
-                                        R.layout.dialog_booking,
-                                        (ViewGroup) ((FragmentActivity) context).findViewById(R.id.bottomSheetContainer)
-                                );
+                                    // Inflate the bottom sheet layout
+                                    View bottomSheetView = LayoutInflater.from(context).inflate(
+                                            R.layout.dialog_booking,
+                                            (ViewGroup) ((FragmentActivity) context).findViewById(R.id.bottomSheetContainer)
+                                    );
+
+                                    // Initialize UI elements from the bottom sheet layout
+                                    TextView bookingTitle = bottomSheetView.findViewById(R.id.bookingTitle);
+                                    TextView bookingMessage = bottomSheetView.findViewById(R.id.bookingMessage);
+                                    TextView contactNumberTV = bottomSheetView.findViewById(R.id.contactNum); // Add TextView for contact number
+                                    Button confirmBookingButton = bottomSheetView.findViewById(R.id.confirmBookingButton);
+                                    Button cancelBookingButton = bottomSheetView.findViewById(R.id.cancelBookingButton);
+                                    Button selectTimeButton = bottomSheetView.findViewById(R.id.selectTimeButton);
+                                    Button selectPaymentMethodButton = bottomSheetView.findViewById(R.id.selectPaymentMethodButton);
+                                    Button selectServicesButton = bottomSheetView.findViewById(R.id.selectServicesButton);
+
+                                    // Set shop name and fetched address
+                                    bookingTitle.setText(shop.getShopName());
+                                    bookingMessage.setText(address);
+                                    contactNumberTV.setText(contactNumber != null ? contactNumber : "Contact number not available");
+
+
+                                    selectTimeButton.setOnClickListener(v -> {
+                                        showTimePicker((FragmentActivity) context, selectTimeButton);
+                                    });
+
+                                    selectPaymentMethodButton.setOnClickListener(v -> {
+                                        showPaymentMethodPicker(context, selectPaymentMethodButton);
+                                    });
+
+                                    selectServicesButton.setOnClickListener(v -> {
+                                        fetchServices(shopUid, servicesData -> {
+                                            if (servicesData != null) {
+                                                showServicePicker(context, selectServicesButton, servicesData);
+                                            } else {
+                                                Toast.makeText(context, "Failed to load services", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    });
+
+                                    confirmBookingButton.setOnClickListener(confirmView -> {
+                                        // Collect the selected time, payment method, and services
+                                        String selectedTime = selectTimeButton.getText().toString(); // Assume the time is set on the button
+                                        String selectedPaymentMethod = selectPaymentMethodButton.getText().toString(); // Assume payment method is selected
+                                        String selectedServices = selectServicesButton.getText().toString(); // Assume services are selected
+
+                                        // Validate that all required fields are selected
+                                        if (selectedTime.equals("Select Time") || selectedPaymentMethod.equals("Select Payment Method") || selectedServices.equals("Pick a Service")) {
+                                            Toast.makeText(context, "Please complete all fields before confirming the booking.", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+
+                                        // Generate a random orderId (12 alphanumeric characters)
+                                        String orderId = generateRandomOrderId();
+
+                                        // Create a map for the order details
+                                        Map<String, Object> orderData = new HashMap<>();
+                                        orderData.put("shopId", shop.getUid());  // Assuming the shop UID is the shopId
+                                        orderData.put("time", selectedTime);
+                                        orderData.put("paymethod", selectedPaymentMethod);
+                                        orderData.put("service", selectedServices);
+                                        orderData.put("accepted", false);  // Default value for accepted
+                                        orderData.put("rejected", false);  // Default value for rejected
+
+                                        // Store the order in the "orders" collection
+                                        firestore.collection("orders")
+                                                .document(orderId)
+                                                .set(orderData)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Toast.makeText(context, "Booking confirmed for " + shop.getShopName(), Toast.LENGTH_SHORT).show();
+                                                    bottomSheetDialog.dismiss();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(context, "Failed to confirm booking", Toast.LENGTH_SHORT).show();
+                                                });
+                                    });
 
 
 
-                                // Initialize UI elements from the bottom sheet layout
-                                TextView bookingTitle = bottomSheetView.findViewById(R.id.bookingTitle);
-                                TextView bookingMessage = bottomSheetView.findViewById(R.id.bookingMessage);
-                                Button confirmBookingButton = bottomSheetView.findViewById(R.id.confirmBookingButton);
-                                Button cancelBookingButton = bottomSheetView.findViewById(R.id.cancelBookingButton);
-                                Button selectTimeButton = bottomSheetView.findViewById(R.id.selectTimeButton); // Add this button to your layout
-                                Button selectPaymentMethodButton = bottomSheetView.findViewById(R.id.selectPaymentMethodButton);
-                                Button selectServicesButton = bottomSheetView.findViewById(R.id.selectServicesButton);
 
-                                // Move fetchServices logic to button click
-                                selectServicesButton.setOnClickListener(v -> {
-                                    // Fetch services for the selected shop only when button is clicked
-                                    fetchServices(shopUid, servicesData -> {
-                                        if (servicesData != null) {
-                                            // Create and show the checkbox picker
-                                            showServicePicker(context, selectServicesButton, servicesData);
-                                        } else {
-                                            Toast.makeText(context, "Failed to load services", Toast.LENGTH_SHORT).show();
+                                    cancelBookingButton.setOnClickListener(cancelView -> bottomSheetDialog.dismiss());
+
+                                    bottomSheetDialog.setContentView(bottomSheetView);
+                                    bottomSheetDialog.setOnShowListener(dialog -> {
+                                        BottomSheetDialog d = (BottomSheetDialog) dialog;
+                                        FrameLayout bottomSheet = d.findViewById(R.id.bottomSheetContainer);
+                                        if (bottomSheet != null) {
+                                            BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheet);
+                                            behavior.setPeekHeight(Resources.getSystem().getDisplayMetrics().heightPixels, true);
+                                            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                            behavior.setSkipCollapsed(true);
                                         }
                                     });
+
+                                    bottomSheetDialog.show();
                                 });
-
-
-                                bookingTitle.setText(shop.getShopName());
-                                bookingMessage.setText("[shop address here]");
-
-                                selectTimeButton.setOnClickListener(v -> {
-                                    showTimePicker((FragmentActivity) context, selectTimeButton);
-                                });
-
-
-                                selectPaymentMethodButton.setOnClickListener(v -> {
-                                    showPaymentMethodPicker(context, selectPaymentMethodButton);
-                                });
-
-
-                                confirmBookingButton.setOnClickListener(confirmView -> {
-                                    Toast.makeText(context, "Booking confirmed for " + shop.getShopName(), Toast.LENGTH_SHORT).show();
-                                    bottomSheetDialog.dismiss();
-                                    // Add code to save booking to Firestore
-                                });
-
-                                cancelBookingButton.setOnClickListener(cancelView -> bottomSheetDialog.dismiss());
-
-                                bottomSheetDialog.setContentView(bottomSheetView);
-                                bottomSheetDialog.setOnShowListener(dialog -> {
-                                    BottomSheetDialog d = (BottomSheetDialog) dialog;
-                                    FrameLayout bottomSheet = d.findViewById(R.id.bottomSheetContainer);
-                                    if (bottomSheet != null) {
-                                        BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheet);
-                                        behavior.setPeekHeight(Resources.getSystem().getDisplayMetrics().heightPixels, true);
-                                        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                                        behavior.setSkipCollapsed(true);
-                                    }
-                                });
-
-                                bottomSheetDialog.show();
-
                             } else {
                                 Toast.makeText(context, "Shop is currently closed", Toast.LENGTH_SHORT).show();
                             }
                         });
-
-
                     }
                 });
 
         listenerRegistrations.add(registration);
     }
+
 
     @Override
     public int getItemCount() {
@@ -223,9 +256,9 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
             timeButton.setText(formattedTime);
         });
 
-        timePicker.addOnNegativeButtonClickListener(v -> {
+      /*  timePicker.addOnNegativeButtonClickListener(v -> {
             Toast.makeText(activity, "Time selection canceled", Toast.LENGTH_SHORT).show();
-        });
+        });*/
     }
 
     private void showPaymentMethodPicker(Context context, Button paymentMethodButton) {
@@ -284,52 +317,112 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
             return;
         }
 
-        // Extract services and their availability
-        List<String> servicesList = new ArrayList<>(servicesData.keySet());
-        boolean[] checkedItems = new boolean[servicesList.size()];
-        boolean[] enabledItems = new boolean[servicesList.size()];
+        // Map database keys to friendly display names
+        Map<String, String> serviceNameMap = new LinkedHashMap<>();
+        serviceNameMap.put("Service1", "Check-up");
+        serviceNameMap.put("Service2", "Maintenance");
+        serviceNameMap.put("Service3", "Repair");
+        serviceNameMap.put("Service4", "Car Wash");
 
-        for (int i = 0; i < servicesList.size(); i++) {
-            Boolean isEnabled = (Boolean) servicesData.get(servicesList.get(i));
-            enabledItems[i] = isEnabled != null && isEnabled; // Enabled if true in Firestore
-            checkedItems[i] = false; // Default all unchecked
+        // Ordered lists for services
+        List<String> serviceKeys = new ArrayList<>();
+        List<String> serviceDisplayNames = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : serviceNameMap.entrySet()) {
+            // Check if the service exists in the data and is enabled
+            Boolean isEnabled = (Boolean) servicesData.get(entry.getKey());
+            if (isEnabled != null && isEnabled) {
+                serviceKeys.add(entry.getKey()); // Keep track of the database keys in order
+                serviceDisplayNames.add(entry.getValue()); // Use friendly names in order
+            }
         }
 
+        // If no services are enabled
+        if (serviceDisplayNames.isEmpty()) {
+            Toast.makeText(context, "No services available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean[] checkedItems = new boolean[serviceDisplayNames.size()]; // Default all unchecked
+
         // Create a list of services with checkboxes
-        CharSequence[] servicesArray = servicesList.toArray(new CharSequence[0]);
+        CharSequence[] servicesArray = serviceDisplayNames.toArray(new CharSequence[0]);
 
         // Build the dialog
         new MaterialAlertDialogBuilder(context)
-                .setTitle("Select Services")
+                .setTitle("Available Services")
                 .setMultiChoiceItems(servicesArray, checkedItems, (dialog, which, isChecked) -> {
-                    if (!enabledItems[which]) {
-                        Toast.makeText(context, "Service unavailable", Toast.LENGTH_SHORT).show();
-                        ((androidx.appcompat.app.AlertDialog) dialog).getListView().setItemChecked(which, false);
-                    } else {
-                        checkedItems[which] = isChecked;
-                    }
+                    checkedItems[which] = isChecked; // Update selected state
                 })
                 .setPositiveButton("OK", (dialog, which) -> {
                     // Update button text with selected services
                     StringBuilder selectedServices = new StringBuilder();
-                    for (int i = 0; i < servicesList.size(); i++) {
+                    for (int i = 0; i < serviceKeys.size(); i++) {
                         if (checkedItems[i]) {
                             if (selectedServices.length() > 0) {
                                 selectedServices.append(", ");
                             }
-                            selectedServices.append(servicesList.get(i));
+                            selectedServices.append(serviceDisplayNames.get(i));
                         }
                     }
                     if (selectedServices.length() > 0) {
                         servicesButton.setText(selectedServices.toString());
                     } else {
-                        servicesButton.setText("Select Services");
+                        servicesButton.setText("Pick a Service");
                     }
                     dialog.dismiss();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
+    private void fetchShopInfo(String shopUid, OnShopInfoFetchedListener listener) {
+        firestore.collection("users")
+                .document(shopUid)
+                .collection(shopUid)
+                .document("ShopInfo")
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String street = documentSnapshot.getString("street");
+                        String barangay = documentSnapshot.getString("barangay");
+                        String city = documentSnapshot.getString("city");
+                        String province = documentSnapshot.getString("province");
+                        String contactNumber = documentSnapshot.getString("contact"); // Retrieve the contact number
+
+                        // Format the address
+                        StringBuilder addressBuilder = new StringBuilder();
+                        if (street != null && !street.isEmpty()) addressBuilder.append(street).append(", ");
+                        if (barangay != null && !barangay.isEmpty()) addressBuilder.append(barangay).append(", ");
+                        if (city != null && !city.isEmpty()) addressBuilder.append(city).append(", ");
+                        if (province != null && !province.isEmpty()) addressBuilder.append(province);
+
+                        String formattedAddress = addressBuilder.toString().replaceAll(", $", "");
+
+                        // Pass both address and contact number to the listener
+                        listener.onShopInfoFetched(formattedAddress, contactNumber);
+                    } else {
+                        listener.onShopInfoFetched("Address not available", null);
+                    }
+                })
+                .addOnFailureListener(e -> listener.onShopInfoFetched("Error fetching address", null));
+    }
+
+    interface OnShopInfoFetchedListener {
+        void onShopInfoFetched(String address, String contactNumber);
+    }
+
+    private String generateRandomOrderId() {
+        // Generate a random 12-character alphanumeric string for orderId
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder orderId = new StringBuilder(12);
+        for (int i = 0; i < 12; i++) {
+            int index = (int) (Math.random() * characters.length());
+            orderId.append(characters.charAt(index));
+        }
+        return orderId.toString();
+    }
+
 
 
 }

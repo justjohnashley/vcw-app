@@ -110,7 +110,7 @@
                        android:layout_width="match_parent"
                        android:layout_height="wrap_content"
                        android:padding="24dp"
-                       android:text="Check up"
+                       android:text="Check- up"
                        android:textSize="16sp"
                        tools:layout_editor_absoluteX="142dp"
                        tools:layout_editor_absoluteY="334dp" />

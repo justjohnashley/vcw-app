@@ -56,73 +56,122 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.167">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="48dp"
-                android:orientation="vertical"
-                android:padding="10dp">
+                android:layout_height="match_parent">
 
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:id="@+id/imageView6"
+                    android:layout_width="557dp"
+                    android:layout_height="492dp"
                     android:layout_gravity="center"
-                    android:layout_margin="36dp"
-                    android:src="@drawable/vcw_iconalt">
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="13dp"
+                    android:layout_marginBottom="464dp"
+                    android:src="@drawable/vcw_iconalt"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.518"
+                    app:layout_constraintStart_toStartOf="parent">
+
 
                 </ImageView>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="vertical">
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:padding="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.794">
 
-                    <TextView
-                        android:id="@+id/userid2"
+
+                    <ImageView
+                        android:layout_width="125dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/vcw_uicon" />
+
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Logged in as:"
-                        android:textAlignment="center"
-                        android:textSize="16sp" />
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="12dp"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/userid"
+                        <TextView
+                            android:id="@+id/userid2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Logged in as:"
+                            android:textAlignment="center"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/userid"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="login details"
+                            android:textAlignment="center"
+                            android:textColor="@color/darkblue"
+                            android:textSize="24sp" />
+
+
+                    </LinearLayout>
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/chpwBtn"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="login details"
-                        android:textAlignment="center"
-                        android:textColor="@color/darkblue"
-                        android:textSize="24sp" />
+                        android:layout_margin="2dp"
+                        android:backgroundTint="@color/darkerblue"
+                        android:text="CHANGE PASSWORD" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/editinfoBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:backgroundTint="@color/lightblue"
+                        android:text="EDIT CONTACT DETAILS" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/delaccBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:backgroundTint="@color/lighterblue"
+                        android:text="DELETE ACCOUNT"
+                        android:textColor="@color/darkblue" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/logoutBtn"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="2dp"
+                        android:drawableTop="@drawable/baseline_logout_24"
+                        android:text="LOGOUT"
+                        android:textColor="@color/red" />
 
                 </LinearLayout>
 
 
-                <Button
-                    android:id="@+id/chpwBtn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:backgroundTint="@color/darkerblue"
-                    android:text="CHANGE PASSWORD" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <Button
-                    android:id="@+id/logoutBtn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:backgroundTint="@color/lighterblue"
-                    android:textColor="@color/darkblue"
-                    android:text="LOGOUT" />
-
-            </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 
 
     <FrameLayout
