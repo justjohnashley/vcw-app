@@ -20,6 +20,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -149,14 +150,25 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
                                         // Generate a random orderId (12 alphanumeric characters)
                                         String orderId = generateRandomOrderId();
 
+                                        // Get the current user's UID
+                                        String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                                        if (currentUserUid == null || currentUserUid.isEmpty()) {
+                                            Toast.makeText(context, "User not authenticated. Please log in.", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+
                                         // Create a map for the order details
                                         Map<String, Object> orderData = new HashMap<>();
                                         orderData.put("shopId", shop.getUid());  // Assuming the shop UID is the shopId
+                                        orderData.put("shopName", shop.getShopName()); // Add the shop name
+                                        orderData.put("userId", currentUserUid); // Add the current user's UID
                                         orderData.put("time", selectedTime);
                                         orderData.put("paymethod", selectedPaymentMethod);
                                         orderData.put("service", selectedServices);
                                         orderData.put("accepted", false);  // Default value for accepted
                                         orderData.put("rejected", false);  // Default value for rejected
+                                        orderData.put("status", "pending"); // Default value for status
 
                                         // Store the order in the "orders" collection
                                         firestore.collection("orders")
@@ -170,8 +182,6 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
                                                     Toast.makeText(context, "Failed to confirm booking", Toast.LENGTH_SHORT).show();
                                                 });
                                     });
-
-
 
 
                                     cancelBookingButton.setOnClickListener(cancelView -> bottomSheetDialog.dismiss());
