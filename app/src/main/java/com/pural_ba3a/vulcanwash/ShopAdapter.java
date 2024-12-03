@@ -25,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -247,28 +248,40 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
         timePicker.show(activity.getSupportFragmentManager(), "MaterialTimePicker");
 
         timePicker.addOnPositiveButtonClickListener(v -> {
-            int hour = timePicker.getHour();
-            int minute = timePicker.getMinute();
-            boolean isAM = hour < 12;
-            String period = isAM ? "AM" : "PM";
+            int selectedHour = timePicker.getHour();
+            int selectedMinute = timePicker.getMinute();
 
-            // Convert 24-hour to 12-hour format
-            if (hour > 12) {
-                hour -= 12;
-            } else if (hour == 0) {
-                hour = 12;
+            // Get current time
+            Calendar currentTime = Calendar.getInstance();
+            int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
+            int currentMinute = currentTime.get(Calendar.MINUTE);
+
+            // Calculate the time difference in minutes
+            int selectedTotalMinutes = selectedHour * 60 + selectedMinute;
+            int currentTotalMinutes = currentHour * 60 + currentMinute;
+            int timeDifference = selectedTotalMinutes - currentTotalMinutes;
+
+            if (timeDifference < 60) {
+                // Show error if the selected time is less than one hour from the current time
+                Toast.makeText(activity, "Please select a time at least one hour from now.", Toast.LENGTH_SHORT).show();
+            } else {
+                // Convert 24-hour to 12-hour format
+                boolean isAM = selectedHour < 12;
+                String period = isAM ? "AM" : "PM";
+
+                if (selectedHour > 12) {
+                    selectedHour -= 12;
+                } else if (selectedHour == 0) {
+                    selectedHour = 12;
+                }
+
+                // Format the time as a string
+                String formattedTime = String.format("%02d:%02d %s", selectedHour, selectedMinute, period);
+
+                // Update the button text with the selected time
+                timeButton.setText(formattedTime);
             }
-
-            // Format the time as a string
-            String formattedTime = String.format("%02d:%02d %s", hour, minute, period);
-
-            // Update the button text with the selected time
-            timeButton.setText(formattedTime);
         });
-
-      /*  timePicker.addOnNegativeButtonClickListener(v -> {
-            Toast.makeText(activity, "Time selection canceled", Toast.LENGTH_SHORT).show();
-        });*/
     }
 
     private void showPaymentMethodPicker(Context context, Button paymentMethodButton) {

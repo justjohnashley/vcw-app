@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.pural_ba3a.vulcanwash.databinding.FragThreeBinding;
 import com.pural_ba3a.vulcanwash.databinding.FragThreeadminBinding;
 
@@ -23,6 +24,7 @@ public class FragThreeAdmin extends Fragment {
     NetworkMonitor networkMonitor;
 
     FragThreeadminBinding binding;
+    FirebaseFirestore firestore;
     FirebaseAuth mAuth;
     FirebaseUser user;
 
@@ -84,6 +86,67 @@ public class FragThreeAdmin extends Fragment {
             }
         });
 
+        binding.editinfoBtn.setOnClickListener(view -> {
+            Intent intent = new Intent(getContext(), UserInfo.class); // Navigate to UserInfo activity
+            startActivity(intent);
+        });
+
+
+        binding.delaccBtn.setOnClickListener(view -> {
+            if (networkMonitor.isNetworkAvailable()) {
+                binding.pgbarOverlay.setAlpha(1f);
+                binding.pgbarOverlay.setClickable(true);
+                binding.pgbarOverlay.setFocusable(true);
+
+                new Handler().postDelayed(() -> {
+                    if (user != null) {
+                        // Step 1: Remove user's Firestore entry
+                        String uid = user.getUid();
+                        firestore = FirebaseFirestore.getInstance();
+                        firestore.collection("users").document(uid)
+                                .delete()
+                                .addOnCompleteListener(task1 -> {
+                                    if (task1.isSuccessful()) {
+                                        // Step 2: Delete user's Firebase Authentication account
+                                        user.delete()
+                                                .addOnCompleteListener(task2 -> {
+                                                    binding.pgbarOverlay.setVisibility(View.GONE);
+                                                    binding.pgbarOverlay.setClickable(false);
+                                                    binding.pgbarOverlay.setFocusable(false);
+
+                                                    if (task2.isSuccessful()) {
+                                                        Toast.makeText(getContext(), "Account deleted successfully.", Toast.LENGTH_SHORT).show();
+                                                        // Step 3: Redirect to CustomerPage
+                                                        Intent intent = new Intent(getContext(), CustomerPage.class);
+                                                        startActivity(intent);
+                                                        getActivity().finish();
+                                                    } else {
+                                                        Toast.makeText(getContext(), "Failed to delete account: " + task2.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                    }
+                                                });
+                                    } else {
+                                        binding.pgbarOverlay.setVisibility(View.GONE);
+                                        Toast.makeText(getContext(), "Failed to delete Firestore entry: " + task1.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                    } else {
+                        binding.pgbarOverlay.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "No user is currently logged in.", Toast.LENGTH_SHORT).show();
+                    }
+                }, 2000);
+            } else {
+                Toast.makeText(getContext(), "No internet connection. Please connect to the internet to delete your account.", Toast.LENGTH_LONG).show();
+            }
+        });
+
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Unregister the network callback when the fragment or activity is destroyed
+        binding = null;
+        networkMonitor.unregisterCallback();
     }
 }

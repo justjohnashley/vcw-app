@@ -1,11 +1,8 @@
 package com.pural_ba3a.vulcanwash;
 
-import static androidx.navigation.ui.NavigationUI.setupActionBarWithNavController;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -16,22 +13,19 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.pural_ba3a.vulcanwash.databinding.UserHomepageBinding;
 
 public class UserPage extends AppCompatActivity {
 
-    UserHomepageBinding binding;
-    FirebaseAuth mAuth;
-    FirebaseUser user;
+    private UserHomepageBinding binding;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,20 +42,15 @@ public class UserPage extends AppCompatActivity {
         });
 
         mAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
-
-
 
         Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.vcw_loading);
         binding.loadingVideoView.setVideoURI(videoUri);
         binding.loadingVideoView.setOnPreparedListener(mp -> {
             mp.setLooping(true);
             binding.loadingVideoView.start();
-
         });
-
-
-
 
         // Show initial fragment
         showFragment(new FragOne(), "FRAG_ONE");
@@ -77,6 +66,32 @@ public class UserPage extends AppCompatActivity {
             }
             return true;
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (user != null) {
+            String uid = user.getUid();
+            DocumentReference userDocRef = firestore.collection("users").document(uid);
+
+            userDocRef.get().addOnSuccessListener(snapshot -> {
+                if (snapshot.exists()) {
+                    String username = snapshot.getString("username");
+                    String contact = snapshot.getString("contact");
+
+                    if (username == null || contact == null) {
+                        // Redirect to the UserInfo page if either field is missing
+                        Toast.makeText(this, "Please complete your profile information.", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(this, UserInfo.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+            }).addOnFailureListener(e ->
+                    Toast.makeText(this, "Error checking fields: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+            );
+        }
     }
 
     // Optimized method to show fragments without re-creating them
@@ -101,10 +116,4 @@ public class UserPage extends AppCompatActivity {
 
         transaction.commit();
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 }
-

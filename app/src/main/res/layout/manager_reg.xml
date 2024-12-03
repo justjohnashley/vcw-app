@@ -150,21 +150,36 @@
                     android:text="SIGN UP"
                     android:textSize="16dp"
                     android:textStyle="bold"
-                    tools:layout_editor_absoluteX="261dp"
-                    tools:layout_editor_absoluteY="435dp" />
+                    />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/vcw_bline" />
+                <Button
+                    android:id="@+id/privacypolicy"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="12dp"
+                    android:text="PRIVACY POLICY"
+                    android:textSize="16dp"
+                    android:textStyle="bold"
+                    />
 
-                <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:scaleType="centerCrop"
-                    android:layout_margin="8dp"
-                    android:src="@drawable/vcw_google" />
+                <!--    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/vcw_bline" />
+
+                    <ImageView
+                        android:id="@+id/googleAuth"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:scaleType="centerCrop"
+                        android:layout_margin="8dp"
+                        android:clickable="true"
+                        android:src="@drawable/vcw_google" /> -->
 
             </LinearLayout>
 

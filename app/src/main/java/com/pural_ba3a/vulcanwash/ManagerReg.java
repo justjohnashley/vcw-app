@@ -179,6 +179,18 @@ public class ManagerReg extends AppCompatActivity {
             }
         });
 
+        binding.privacypolicy.setOnClickListener(view -> {
+            // The URL to the privacy policy
+            String url = "https://sites.google.com/view/vcwashapp-privacypolicy/home";
+
+            // Create an Intent to open the URL
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+
+            // Start the activity to open the website
+            startActivity(intent);
+        });
+
+
     }
 
     // Real-time email validation

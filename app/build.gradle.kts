@@ -14,7 +14,7 @@ android {
         applicationId = "com.pural_ba3a.vulcanwash"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
+        versionCode = 3
         versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

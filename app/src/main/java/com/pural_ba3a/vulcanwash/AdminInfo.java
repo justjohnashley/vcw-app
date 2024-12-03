@@ -6,7 +6,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +18,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -60,7 +63,16 @@ public class AdminInfo extends AppCompatActivity {
 
         // Terms & Conditions checkbox logic
         binding.tnc.setOnCheckedChangeListener((buttonView, isChecked) -> binding.submitBtn.setEnabled(isChecked));
-        binding.tncBtn.setOnClickListener(view -> showTermsDialog());
+        binding.tnc.setOnClickListener(v -> {
+            CheckBox checkBox = (CheckBox) v;
+            if (checkBox.isChecked()) {
+                // If the user attempts to check the box, show the Terms and Conditions dialog first
+                showTermsDialog(checkBox);
+            } else {
+                // Allow the user to uncheck without confirmation
+                checkBox.setChecked(false);
+            }
+        });
 
         // Attach TextWatchers for live validation
         setupTextWatcher(binding.shopname, binding.shopnameLayout, "Shop name is required");
@@ -177,13 +189,33 @@ public class AdminInfo extends AppCompatActivity {
         return isValid;
     }
 
-    // Show terms dialog
-    private void showTermsDialog() {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dgbox_tnc);
-        Button closeButton = dialog.findViewById(R.id.closeButton);
-        closeButton.setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
+    // Modified showTermsDialog method
+    private void showTermsDialog(CheckBox checkBox) {
+        // Inflate the custom layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dgbox_tnc, null);
+
+        // Find the TextView and set the terms and conditions text
+        TextView termsTextView = dialogView.findViewById(R.id.tv_terms_conditions);
+        termsTextView.setText(getString(R.string.terms_and_conditions));
+
+        // Build and show the dialog
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Terms and Conditions")
+                .setView(dialogView)
+                .setPositiveButton("Agree", (dialog, which) -> {
+                    Toast.makeText(this, "You have accepted the Terms and Conditions.", Toast.LENGTH_SHORT).show();
+                    // Allow the checkbox to be ticked
+                    checkBox.setChecked(true);
+                    dialog.dismiss();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    Toast.makeText(this, "You have declined the Terms and Conditions.", Toast.LENGTH_SHORT).show();
+                    // Prevent the checkbox from being ticked
+                    checkBox.setChecked(false);
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
     }
 
     // Validate phone number with libphonenumber

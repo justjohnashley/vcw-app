@@ -1,11 +1,59 @@
 <resources>
     <string name="app_name">VulCANWash</string>
 
-        <string name="booking_title">Booking Confirmation</string>
-        <string name="booking_message">Would you like to book at %1$s?</string> <!-- %1$s will be replaced by shop name -->
-        <string name="cancel">Cancel</string>
-        <string name="decline">Decline</string>
-        <string name="accept">Accept</string>
+    <string name="booking_title">Booking Confirmation</string>
+    <string name="booking_message">Would you like to book at %1$s?</string> <!-- %1$s will be replaced by shop name -->
+    <string name="cancel">Cancel</string>
+    <string name="decline">Decline</string>
+    <string name="accept">Accept</string>
 
+
+    <string name="terms_and_conditions">
+        <![CDATA[
+            Effective Date: December 1, 2024 \n\n
+
+            Welcome to VulcanWash! By using this app, you agree to the following terms and conditions. Please read them carefully before proceeding. \n\n
+
+            1. General Use \n
+            1.1. By accessing and using VulcanWash, you agree to be bound by these terms. \n
+            1.2. You must be at least 18 years old or have parental/guardian consent to use this app. \n\n
+
+            2. User Account \n
+            2.1. Users are required to provide accurate and complete information during account creation. \n
+            2.2. You are responsible for maintaining the confidentiality of your login credentials. \n
+            2.3. VulcanWash is not liable for any unauthorized access to your account. \n\n
+
+            3. Services Provided \n
+            3.1. VulcanWash connects users with vulcanizing services and their auto needs. \n
+            3.2. Service availability and pricing are subject to change without notice. \n
+            3.3. VulcanWash does not guarantee the availability of any specific service provider. \n\n
+
+            4. Payments \n
+            4.1. All payments for services booked through the app must be made as per the specified terms. \n
+            4.2. Refunds and cancellations are subject to the policies of the respective service provider. \n\n
+
+            5. User Conduct \n
+            5.1. Users must not use VulcanWash for any unlawful or prohibited activity. \n
+            5.2. Harassment, abuse, or inappropriate behavior towards other users or service providers is strictly prohibited. \n
+            5.3. VulcanWash reserves the right to suspend or terminate accounts violating these rules. \n\n
+
+            6. Liability \n
+            6.1. VulcanWash acts as an intermediary and is not responsible for the quality or delivery of services provided by third parties. \n
+            6.2. VulcanWash is not liable for damages resulting from misuse of the app or errors in service delivery. \n\n
+
+            7. Privacy \n
+            7.1. Your personal information is collected and used in accordance with our Privacy Policy. \n
+            7.2. By using VulcanWash, you consent to the collection, use, and sharing of your information as outlined in the Privacy Policy. \n\n
+
+            8. Changes to Terms \n
+            8.1. VulcanWash reserves the right to modify these terms at any time. \n
+            8.2. Users will be notified of significant changes, and continued use of the app constitutes acceptance of the revised terms. \n\n
+
+            9. Contact Us \n
+            For any questions or concerns about these terms, please contact us at: \n
+            Email: vcwash.app@gmail.com
+
+        ]]>
+    </string>
 
 </resources>
