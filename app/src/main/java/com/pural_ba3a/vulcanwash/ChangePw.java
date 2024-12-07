@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.pural_ba3a.vulcanwash.databinding.ChangePwBinding;
 
 public class ChangePw extends AppCompatActivity {
@@ -108,8 +110,74 @@ public class ChangePw extends AppCompatActivity {
             }
         });
 
+        // show/hide password function
+
+        binding.newpw.setOnFocusChangeListener((v, hasFocus) -> {
+            // Show or hide the eye icon based on focus
+            if (hasFocus) {
+                binding.eyeIcon.setVisibility(View.VISIBLE);
+                binding.bgeye.setVisibility(View.VISIBLE);
+            } else {
+                binding.eyeIcon.setVisibility(View.GONE);
+                binding.bgeye.setVisibility(View.GONE);
+            }
+        });
+
+        binding.eyeIcon.setOnClickListener(v -> {
+            // Toggle password visibility
+            if ((binding.newpw.getInputType() & InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
+                // Set input type to hidden password
+                binding.newpw.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                binding.eyeIcon.setImageResource(R.drawable.baseline_visibility_off_24); // Closed eye icon
+            } else {
+                // Set input type to visible password
+                binding.newpw.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                binding.eyeIcon.setImageResource(R.drawable.baseline_visibility_24); // Open eye icon
+            }
+
+            // Move the cursor to the end of the text
+            binding.newpw.setSelection(binding.newpw.getText().length());
+        });
+
+        binding.backBtn.setOnClickListener(view -> {
+            if (user != null) {
+                // Retrieve the current user's UID
+                String uid = user.getUid();
+
+                // Access Firestore to determine user type
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("users").document(uid)
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String userType = documentSnapshot.getString("usertype");
+
+                                // Redirect based on user type
+                                if ("manager".equals(userType)) {
+                                    Intent intent = new Intent(ChangePw.this, ManagerPage.class);
+                                    startActivity(intent);
+                                } else if ("customer".equals(userType)) {
+                                    Intent intent = new Intent(ChangePw.this, CustomerPage.class);
+                                    startActivity(intent);
+                                } else {
+                                    Toast.makeText(ChangePw.this, "Unknown user type.", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(ChangePw.this, "User data not found.", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(ChangePw.this, "Failed to fetch user data.", Toast.LENGTH_SHORT).show();
+                        });
+            } else {
+                Toast.makeText(ChangePw.this, "User not logged in.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
     }
+
+
 
     @Override
     protected void onPause() {
@@ -174,7 +242,7 @@ public class ChangePw extends AppCompatActivity {
             return false;
         } else if (!isValidPassword(password)) {
             binding.newpw.setBackgroundResource(R.drawable.border_error);
-            binding.newpw.setError("Password must be at least 8 characters and contain letters and numbers.");
+            binding.newpw.setError("Password must be 8 characters long and contain at least 2 uppercase letters, 2 lowercase letters, 2 digits, and 1 special character.");
             return false;
         } else {
             binding.newpw.setError(null);
@@ -183,6 +251,7 @@ public class ChangePw extends AppCompatActivity {
             return true;
         }
     }
+
 
     private boolean validatePassword2() {
         String password = binding.oldpw.getText().toString().trim();
@@ -199,24 +268,31 @@ public class ChangePw extends AppCompatActivity {
     }
 
     private boolean isValidPassword(String password) {
-        // Password must be at least 8 characters and contain both letters and numbers
+        // Password must be at least 8 characters
         if (password.length() < 8) {
             return false;
         }
-        boolean hasLetter = false;
-        boolean hasDigit = false;
+
+        int upperCaseCount = 0;
+        int lowerCaseCount = 0;
+        int digitCount = 0;
+        int specialCharCount = 0;
+
+        // Check each character in the password
         for (char c : password.toCharArray()) {
-            if (Character.isLetter(c)) {
-                hasLetter = true;
-            }
-            if (Character.isDigit(c)) {
-                hasDigit = true;
-            }
-            if (hasLetter && hasDigit) {
-                return true;
+            if (Character.isUpperCase(c)) {
+                upperCaseCount++;
+            } else if (Character.isLowerCase(c)) {
+                lowerCaseCount++;
+            } else if (Character.isDigit(c)) {
+                digitCount++;
+            } else if (!Character.isLetterOrDigit(c)) {
+                specialCharCount++;
             }
         }
-        return false;
+
+        // Validate that all criteria are met
+        return upperCaseCount >= 2 && lowerCaseCount >= 2 && digitCount >= 2 && specialCharCount >= 1;
     }
 
 }

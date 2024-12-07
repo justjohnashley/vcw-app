@@ -63,14 +63,15 @@ public class FragOne extends Fragment {
                         String uid = document.getId();
 
                         // Retrieve ShopInfo document
-                        firestore.collection("users").document(uid).collection(uid)
-                                .document("ShopInfo")
+                        firestore.collection("users").document(uid)
                                 .get()
                                 .addOnSuccessListener(storeInfoDoc -> {
                                     if (storeInfoDoc.exists()) {
                                         String shopName = storeInfoDoc.getString("shopName");
+                                        String username = storeInfoDoc.getString("username");
+                                        String contact = storeInfoDoc.getString("contact");
                                         if (shopName != null) {
-                                            shopList.add(new Shop(uid, shopName));
+                                            shopList.add(new Shop(uid, shopName, username, contact));
                                             shopAdapter.notifyDataSetChanged();
                                         }
                                     }
@@ -83,7 +84,7 @@ public class FragOne extends Fragment {
                     binding.pgbarOverlay.setVisibility(View.GONE);
                     Toast.makeText(getContext(), "Failed to load shops: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
-        }, 1000);
+        }, 1500);
     }
 
 }

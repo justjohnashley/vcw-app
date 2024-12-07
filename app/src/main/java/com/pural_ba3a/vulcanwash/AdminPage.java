@@ -40,8 +40,7 @@ public class AdminPage extends AppCompatActivity {
 
             // Retrieve usertype and check ShopInfo in a transaction
             userDocRef = firestore.collection("users").document(uid);
-            shopInfoDocRef = firestore.collection("users").document(uid)
-                    .collection(uid).document("ShopInfo");
+            shopInfoDocRef = firestore.collection("users").document(uid);
 
             firestore.runTransaction(transaction -> {
                 userSnapshot = transaction.get(userDocRef);

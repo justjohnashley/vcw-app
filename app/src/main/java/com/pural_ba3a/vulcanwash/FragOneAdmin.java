@@ -69,8 +69,18 @@ public class FragOneAdmin extends Fragment {
 
         // Set up OnClickListener for shopBtn
         binding.shopBtn.setOnClickListener(view -> {
-            if (networkMonitor.isNetworkAvailable()) {
-                toggleShopStatus();
+                    if (networkMonitor.isNetworkAvailable()) {
+                        binding.pgbarOverlay.setVisibility(View.VISIBLE);
+                        binding.pgbarOverlay.setAlpha(1f);
+                        binding.pgbarOverlay.setClickable(true);
+                        binding.pgbarOverlay.setFocusable(true);
+                        new Handler().postDelayed(() -> {
+                            binding.pgbarOverlay.setVisibility(View.GONE);
+                            binding.pgbarOverlay.setClickable(false);
+                            binding.pgbarOverlay.setFocusable(false);
+
+                            toggleShopStatus();
+                        }, 2000);
             } else {
                 Snackbar.make(binding.getRoot(), "No internet connection. Please connect to the internet to proceed with this request.", Snackbar.LENGTH_INDEFINITE).show();
 
@@ -189,7 +199,6 @@ public class FragOneAdmin extends Fragment {
         if (user != null) {
             String uid = user.getUid();
             firestore.collection("users").document(uid)
-                    .collection(uid).document("ShopInfo")
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful() && task.getResult() != null) {

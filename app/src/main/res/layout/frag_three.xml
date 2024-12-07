@@ -111,12 +111,12 @@
                         android:text="EDIT CONTACT DETAILS" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/delaccBtn"
+                        android:id="@+id/emailBtn"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="2dp"
                         android:backgroundTint="@color/lighterblue"
-                        android:text="DELETE ACCOUNT"
+                        android:text="CUSTOMER SUPPORT"
                         android:textColor="@color/darkblue" />
 
                     <com.google.android.material.button.MaterialButton

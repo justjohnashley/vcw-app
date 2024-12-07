@@ -152,38 +152,62 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
                                         String orderId = generateRandomOrderId();
 
                                         // Get the current user's UID
-                                        String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                        FirebaseAuth auth = FirebaseAuth.getInstance();
+                                        String currentUserUid = auth.getCurrentUser().getUid();
 
                                         if (currentUserUid == null || currentUserUid.isEmpty()) {
                                             Toast.makeText(context, "User not authenticated. Please log in.", Toast.LENGTH_SHORT).show();
                                             return;
                                         }
 
-                                        // Create a map for the order details
-                                        Map<String, Object> orderData = new HashMap<>();
-                                        orderData.put("shopId", shop.getUid());  // Assuming the shop UID is the shopId
-                                        orderData.put("shopName", shop.getShopName()); // Add the shop name
-                                        orderData.put("userId", currentUserUid); // Add the current user's UID
-                                        orderData.put("time", selectedTime);
-                                        orderData.put("paymethod", selectedPaymentMethod);
-                                        orderData.put("service", selectedServices);
-                                        orderData.put("accepted", false);  // Default value for accepted
-                                        orderData.put("rejected", false);  // Default value for rejected
-                                        orderData.put("status", "pending"); // Default value for status
+                                        // Fetch the current user's details
+                                        firestore.collection("users")
+                                                .document(currentUserUid)
+                                                .get()
+                                                .addOnSuccessListener(userSnapshot -> { // Renamed variable here
+                                                    if (userSnapshot.exists()) {
+                                                        String username = userSnapshot.getString("username"); // User's name
+                                                        String contact = userSnapshot.getString("contact");  // User's contact details
 
-                                        // Store the order in the "orders" collection
-                                        firestore.collection("orders")
-                                                .document(orderId)
-                                                .set(orderData)
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Toast.makeText(context, "Booking confirmed for " + shop.getShopName(), Toast.LENGTH_SHORT).show();
-                                                    bottomSheetDialog.dismiss();
+                                                        if (username == null || contact == null) {
+                                                            Toast.makeText(context, "User details are incomplete. Please update your profile.", Toast.LENGTH_SHORT).show();
+                                                            return;
+                                                        }
+
+                                                        // Create a map for the order details
+                                                        Map<String, Object> orderData = new HashMap<>();
+                                                        orderData.put("shopId", shop.getUid());      // Shop UID
+                                                        orderData.put("shopName", shop.getShopName()); // Shop Name
+                                                        orderData.put("username", username);         // Customer's username
+                                                        orderData.put("contact", contact);           // Customer's contact
+                                                        orderData.put("userId", currentUserUid);      // Customer's UID
+                                                        orderData.put("time", selectedTime);
+                                                        orderData.put("paymethod", selectedPaymentMethod);
+                                                        orderData.put("service", selectedServices);
+                                                        orderData.put("orderId", orderId);
+                                                        orderData.put("accepted", false);  // Default value for accepted
+                                                        orderData.put("rejected", false);  // Default value for rejected
+                                                        orderData.put("status", "pending"); // Default value for status
+
+                                                        // Store the order in the "orders" collection
+                                                        firestore.collection("orders")
+                                                                .document(orderId)
+                                                                .set(orderData)
+                                                                .addOnSuccessListener(aVoid -> {
+                                                                    Toast.makeText(context, "Booking confirmed for " + shop.getShopName(), Toast.LENGTH_SHORT).show();
+                                                                    bottomSheetDialog.dismiss();
+                                                                })
+                                                                .addOnFailureListener(e -> {
+                                                                    Toast.makeText(context, "Failed to confirm booking", Toast.LENGTH_SHORT).show();
+                                                                });
+                                                    } else {
+                                                        Toast.makeText(context, "Failed to fetch user details.", Toast.LENGTH_SHORT).show();
+                                                    }
                                                 })
                                                 .addOnFailureListener(e -> {
-                                                    Toast.makeText(context, "Failed to confirm booking", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(context, "Error fetching user details.", Toast.LENGTH_SHORT).show();
                                                 });
                                     });
-
 
                                     cancelBookingButton.setOnClickListener(cancelView -> bottomSheetDialog.dismiss());
 
@@ -399,11 +423,9 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ShopViewHolder
                 .show();
     }
 
-    private void fetchShopInfo(String shopUid, OnShopInfoFetchedListener listener) {
+    private void fetchShopInfo(String uid, OnShopInfoFetchedListener listener) {
         firestore.collection("users")
-                .document(shopUid)
-                .collection(shopUid)
-                .document("ShopInfo")
+                .document(uid)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {

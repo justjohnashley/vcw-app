@@ -68,7 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="20dp"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="5dp">
@@ -95,17 +95,48 @@
                     android:paddingStart="12dp"
                     android:padding="6dp" />
 
-                <EditText
-                    android:id="@+id/password"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginBottom="5dp"
-                    android:background="@drawable/gray_border"
-                    android:drawableRight="@drawable/baseline_lock_24"
-                    android:hint="Password"
-                    android:paddingStart="12dp"
-                    android:inputType="textPassword"
-                    android:padding="6dp" />
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginBottom="5dp"
+                        android:background="@drawable/gray_border"
+                        android:drawableRight="@drawable/baseline_lock_24"
+                        android:hint="Password"
+                        android:paddingStart="12dp"
+                        android:inputType="textPassword"
+                        android:padding="6dp" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/bgeye"
+                        android:visibility="gone"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="48dp"
+                        android:layout_marginBottom="3dp"
+                        app:cardBackgroundColor="@color/lighterblue">
+
+                        <ImageView
+                            android:id="@+id/eye_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:visibility="gone"
+                            android:src="@drawable/baseline_visibility_off_24"
+                            android:contentDescription="Toggle Password Visibility" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+
+
+                </FrameLayout> <!-- show password layout-->
+
+
 
                 <LinearLayout
                     android:id="@+id/linearLayout"
@@ -124,7 +155,7 @@
                         android:gravity="center"
                         android:text="Don't have an account? "
                         android:textColor="#5C5C5C"
-                        android:textSize="15dp" />
+                        android:textSize="15sp" />
 
 
                     <TextView
@@ -136,7 +167,7 @@
                         android:text="Register now."
                         android:clickable="true"
                         android:textColor="@color/darkblue"
-                        android:textSize="15dp" />
+                        android:textSize="15sp" />
 
                 </LinearLayout>
 
@@ -148,7 +179,7 @@
                     android:layout_marginRight="15dp"
                     android:layout_marginBottom="8dp"
                     android:text="LOGIN"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     tools:layout_editor_absoluteX="261dp"
                     tools:layout_editor_absoluteY="435dp" />
@@ -160,10 +191,10 @@
                     android:layout_height="60dp"
                     android:layout_marginLeft="15dp"
                     android:layout_marginRight="15dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="6dp"
                     android:layout_marginTop="12dp"
                     android:text="FORGOT PASSWORD?"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     />
 

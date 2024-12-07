@@ -12,47 +12,39 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter OTP">
+        android:hint="Enter Contact Number">
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/otp_input"
+            android:id="@+id/phone_number_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number" />
+            android:inputType="phone" />
     </com.google.android.material.textfield.TextInputLayout>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="right">
 
         <com.google.android.material.button.MaterialButton
             style="@style/Widget.Material3.Button.OutlinedButton.Icon"
-            android:id="@+id/send_otp_btn"
+            android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="6dp"
             android:textColor="@color/darkblue"
-            android:text="Send OTP" />
+            android:text=" Cancel" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/verify_otp_btn"
-            android:layout_width="match_parent"
+            android:id="@+id/submit_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="6dp"
-            android:text="Verify OTP" />
+            android:text="Confirm" />
 
     </LinearLayout>
 
 
-
-    <Button
-        android:id="@+id/closeBtn"
-        style="?attr/materialIconButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="close"
-        android:layout_gravity="right"
-        app:icon="@drawable/baseline_close_24" />
 </LinearLayout>
 

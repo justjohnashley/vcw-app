@@ -1,24 +1,27 @@
 package com.pural_ba3a.vulcanwash;
 
-public class Order {
+public class OrderAdmin {
     private String service;
     private String status;
     private String time;
-    private String shopName;
+    private String username;
+    private String contact;
+    private boolean accepted;
+    private boolean rejected;
+    private boolean archived;
     private String orderId;
-    private boolean accepted; // Indicates if the order is accepted
-    private boolean rejected; // Indicates if the order is rejected
-    private boolean archived; // Indicates if the order is archived
+
 
     // Empty constructor for Firestore
-    public Order() {}
+    public OrderAdmin() {}
 
-    public Order(String service, String status, String time, String shopName, String orderId, boolean accepted, boolean rejected, boolean archived) {
+    public OrderAdmin(String service, String status, String time, String username, String contact, String orderId, boolean accepted, boolean rejected, boolean archived) {
         this.service = service;
         this.status = status;
         this.time = time;
-        this.shopName = shopName;
+        this.username = username;
         this.orderId = orderId;
+        this.contact = contact;
         this.accepted = accepted;
         this.rejected = rejected;
         this.archived = archived;
@@ -36,12 +39,16 @@ public class Order {
         return time;
     }
 
-    public String getShopName() {
-        return shopName;
+    public String getusername() {
+        return username;
     }
 
     public String getOrderId() {
         return orderId;
+    }
+
+    public String getContact() {
+        return contact;
     }
 
     public boolean isAccepted() {
@@ -68,12 +75,16 @@ public class Order {
         this.time = time;
     }
 
-    public void setShopName(String shopName) {
-        this.shopName = shopName;
+    public void setusername(String username) {
+        this.username = username;
     }
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     public void setAccepted(boolean accepted) {
@@ -83,7 +94,6 @@ public class Order {
     public void setRejected(boolean rejected) {
         this.rejected = rejected;
     }
-
 
     public void setArchived(boolean archived) {
         this.archived = archived;

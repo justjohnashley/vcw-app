@@ -14,8 +14,8 @@ android {
         applicationId = "com.pural_ba3a.vulcanwash"
         minSdk = 24
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.0.1"
+        versionCode = 5
+        versionName = "0.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,8 +50,6 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.libphonenumber)
-
-
 }
 
 

@@ -65,6 +65,10 @@
                     android:padding="6dp"
                     android:paddingStart="12dp" />
 
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
                 <EditText
                     android:id="@+id/newpw"
                     android:layout_width="match_parent"
@@ -77,6 +81,31 @@
                     android:inputType="textPassword"
                     android:padding="6dp"
                     android:paddingStart="12dp" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/bgeye"
+                        android:visibility="gone"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="48dp"
+                        android:layout_marginBottom="3dp"
+                        app:cardBackgroundColor="@color/lighterblue">
+
+                        <ImageView
+                            android:id="@+id/eye_icon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:visibility="gone"
+                            android:src="@drawable/baseline_visibility_off_24"
+                            android:contentDescription="Toggle Password Visibility" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+
+
+                </FrameLayout> <!-- show password layout-->
 
                 <Button
                     android:id="@+id/checkBtn"
@@ -95,6 +124,20 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+
+        <Button
+            android:id="@+id/backBtn"
+            android:layout_width="75dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/lightblue"
+            android:drawableLeft="@drawable/baseline_arrow_back_24"
+            android:text="."
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

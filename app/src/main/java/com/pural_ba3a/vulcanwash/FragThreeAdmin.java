@@ -1,5 +1,6 @@
 package com.pural_ba3a.vulcanwash;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -60,6 +61,7 @@ public class FragThreeAdmin extends Fragment {
             Intent intent = new Intent(getContext(), ChangePw.class);
             startActivity(intent);
 
+            getActivity().finish();  // Finish the current activity
         });
 
         binding.logoutBtn.setOnClickListener(view -> {
@@ -89,55 +91,22 @@ public class FragThreeAdmin extends Fragment {
         binding.editinfoBtn.setOnClickListener(view -> {
             Intent intent = new Intent(getContext(), UserInfo.class); // Navigate to UserInfo activity
             startActivity(intent);
+
+            getActivity().finish();  // Finish the current activity
         });
 
 
-        binding.delaccBtn.setOnClickListener(view -> {
-            if (networkMonitor.isNetworkAvailable()) {
-                binding.pgbarOverlay.setAlpha(1f);
-                binding.pgbarOverlay.setClickable(true);
-                binding.pgbarOverlay.setFocusable(true);
+        binding.emailBtn.setOnClickListener(view -> {
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+            emailIntent.setData(Uri.parse("mailto:vcwash.app@gmail.com?subject=Client Inquiry"));
 
-                new Handler().postDelayed(() -> {
-                    if (user != null) {
-                        // Step 1: Remove user's Firestore entry
-                        String uid = user.getUid();
-                        firestore = FirebaseFirestore.getInstance();
-                        firestore.collection("users").document(uid)
-                                .delete()
-                                .addOnCompleteListener(task1 -> {
-                                    if (task1.isSuccessful()) {
-                                        // Step 2: Delete user's Firebase Authentication account
-                                        user.delete()
-                                                .addOnCompleteListener(task2 -> {
-                                                    binding.pgbarOverlay.setVisibility(View.GONE);
-                                                    binding.pgbarOverlay.setClickable(false);
-                                                    binding.pgbarOverlay.setFocusable(false);
-
-                                                    if (task2.isSuccessful()) {
-                                                        Toast.makeText(getContext(), "Account deleted successfully.", Toast.LENGTH_SHORT).show();
-                                                        // Step 3: Redirect to CustomerPage
-                                                        Intent intent = new Intent(getContext(), CustomerPage.class);
-                                                        startActivity(intent);
-                                                        getActivity().finish();
-                                                    } else {
-                                                        Toast.makeText(getContext(), "Failed to delete account: " + task2.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                                    }
-                                                });
-                                    } else {
-                                        binding.pgbarOverlay.setVisibility(View.GONE);
-                                        Toast.makeText(getContext(), "Failed to delete Firestore entry: " + task1.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                    } else {
-                        binding.pgbarOverlay.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "No user is currently logged in.", Toast.LENGTH_SHORT).show();
-                    }
-                }, 2000);
-            } else {
-                Toast.makeText(getContext(), "No internet connection. Please connect to the internet to delete your account.", Toast.LENGTH_LONG).show();
+            try {
+                startActivity(emailIntent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(getContext(), "No email app found", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         return binding.getRoot();
     }

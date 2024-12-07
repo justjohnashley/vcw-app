@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Patterns;
@@ -120,6 +121,35 @@ public class CustomerReg extends AppCompatActivity {
             public void afterTextChanged(Editable s) { }
         });
 
+        // show/hide password function
+
+        binding.password.setOnFocusChangeListener((v, hasFocus) -> {
+            // Show or hide the eye icon based on focus
+            if (hasFocus) {
+                binding.eyeIcon.setVisibility(View.VISIBLE);
+                binding.bgeye.setVisibility(View.VISIBLE);
+            } else {
+                binding.eyeIcon.setVisibility(View.GONE);
+                binding.bgeye.setVisibility(View.GONE);
+            }
+        });
+
+        binding.eyeIcon.setOnClickListener(v -> {
+            // Toggle password visibility
+            if ((binding.password.getInputType() & InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
+                // Set input type to hidden password
+                binding.password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                binding.eyeIcon.setImageResource(R.drawable.baseline_visibility_off_24); // Closed eye icon
+            } else {
+                // Set input type to visible password
+                binding.password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                binding.eyeIcon.setImageResource(R.drawable.baseline_visibility_24); // Open eye icon
+            }
+
+            // Move the cursor to the end of the text
+            binding.password.setSelection(binding.password.getText().length());
+        });
+
         binding.signupBtn.setOnClickListener(view -> {
             binding.pgbarOverlay.setVisibility(View.VISIBLE);
             binding.pgbarOverlay.setAlpha(1f);
@@ -144,10 +174,12 @@ public class CustomerReg extends AppCompatActivity {
                                                 FirebaseUser user = mAuth.getCurrentUser();
                                                 if (user != null) {
                                                     String uid = user.getUid();
+                                                    String email = user.getEmail();
 
                                                     // Create the customer data to save
                                                     Map<String, Object> customerData = new HashMap<>();
                                                     customerData.put("uid", uid);
+                                                    customerData.put("email", email);
                                                     customerData.put("usertype", "customer");
 
                                                     // Save the data in Firestore
@@ -220,7 +252,7 @@ public class CustomerReg extends AppCompatActivity {
             return false;
         } else if (!isValidPassword(password)) {
             binding.password.setBackgroundResource(R.drawable.border_error);
-            binding.password.setError("Password must be at least 8 characters and contain letters and numbers.");
+            binding.password.setError("Password must be 8 characters long and contain at least 2 uppercase letters, 2 lowercase letters, 2 digits, and 1 special character.");
             return false;
         } else {
             binding.password.setError(null);
@@ -230,29 +262,38 @@ public class CustomerReg extends AppCompatActivity {
         }
     }
 
+
     private boolean isValidEmail(String email) {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
 
     private boolean isValidPassword(String password) {
-        // Password must be at least 8 characters and contain both letters and numbers
+        // Password must be at least 8 characters
         if (password.length() < 8) {
             return false;
         }
-        boolean hasLetter = false;
-        boolean hasDigit = false;
+
+        int upperCaseCount = 0;
+        int lowerCaseCount = 0;
+        int digitCount = 0;
+        int specialCharCount = 0;
+
+        // Check each character in the password
         for (char c : password.toCharArray()) {
-            if (Character.isLetter(c)) {
-                hasLetter = true;
-            }
-            if (Character.isDigit(c)) {
-                hasDigit = true;
-            }
-            if (hasLetter && hasDigit) {
-                return true;
+            if (Character.isUpperCase(c)) {
+                upperCaseCount++;
+            } else if (Character.isLowerCase(c)) {
+                lowerCaseCount++;
+            } else if (Character.isDigit(c)) {
+                digitCount++;
+            } else if (!Character.isLetterOrDigit(c)) {
+                specialCharCount++;
             }
         }
-        return false;
+
+        // Validate that all criteria are met
+        return upperCaseCount >= 2 && lowerCaseCount >= 2 && digitCount >= 2 && specialCharCount >= 1;
     }
+
 }

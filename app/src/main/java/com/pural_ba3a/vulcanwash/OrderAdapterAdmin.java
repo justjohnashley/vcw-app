@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,11 +19,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
-public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
-    private List<Order> orderList;
+public class OrderAdapterAdmin extends RecyclerView.Adapter<OrderAdapterAdmin.OrderViewHolder> {
+    private List<OrderAdmin> orderList;
     private Context context;
 
-    public OrderAdapter(List<Order> orderList) {
+    public OrderAdapterAdmin(List<OrderAdmin> orderList) {
         this.orderList = orderList;
     }
 
@@ -32,17 +31,18 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     @Override
     public OrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext(); // Save the context for color resources
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_itemadmin, parent, false);
         return new OrderViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        Order order = orderList.get(position);
+        OrderAdmin order = orderList.get(position);
 
         holder.serviceTextView.setText(order.getService());
         holder.timeTextView.setText(order.getTime());
-        holder.shopNameTextView.setText(order.getShopName());
+        holder.usernameTextView.setText(order.getusername());
+        holder.contactTextView.setText(order.getContact());
 
         // Priority: "finished" overrides all other statuses
         if ("finished".equalsIgnoreCase(order.getStatus())) {
@@ -106,26 +106,67 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                 return;
             }
 
-            if ("pending".equalsIgnoreCase(status)) {
+            if ("pending".equalsIgnoreCase(status) && !order.isAccepted()) {
                 new AlertDialog.Builder(context)
-                        .setTitle("Cancel Order")
-                        .setMessage("Are you sure you want to cancel this order?")
-                        .setPositiveButton("Yes", (dialog, which) -> {
+                        .setTitle("Order ID:" + orderId)
+                        .setMessage("Do you want to take this order?")
+                        .setPositiveButton("Accept", (dialog, which) -> {
                             FirebaseFirestore.getInstance()
                                     .collection("orders")
                                     .document(orderId)
-                                    .update("status", "cancelled")
+                                    .update("accepted", true)
                                     .addOnSuccessListener(aVoid ->
-                                            Toast.makeText(context, "Order cancelled.", Toast.LENGTH_SHORT).show())
+                                            Toast.makeText(context, "Order accepted.", Toast.LENGTH_SHORT).show())
                                     .addOnFailureListener(e ->
-                                            Toast.makeText(context, "Failed to cancel order.", Toast.LENGTH_SHORT).show());
+                                            Toast.makeText(context, "Failed to accept order.", Toast.LENGTH_SHORT).show());
                         })
-                        .setNegativeButton("No", null)
+                        .setNegativeButton("Reject", (dialog, which) -> {
+                            FirebaseFirestore.getInstance()
+                                    .collection("orders")
+                                    .document(orderId)
+                                    .update("rejected", true)
+                                    .addOnSuccessListener(aVoid ->
+                                            Toast.makeText(context, "Order rejected.", Toast.LENGTH_SHORT).show())
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(context, "Failed to rejected order.", Toast.LENGTH_SHORT).show());
+                        })
+                        .setNeutralButton("Cancel", null)
                         .show();
-            } else if (order.isArchived() == true || order.isRejected() == true) {
+
+            } else if (order.isArchived() || order.isRejected()) {
                 Toast.makeText(context, "OID: "+orderId, Toast.LENGTH_LONG).show();
-            } else if (order.isAccepted() == true || "ongoing".equalsIgnoreCase(status)) {
-                Toast.makeText(context, "Order cannot be cancelled.", Toast.LENGTH_SHORT).show();
+            } else if (order.isAccepted() && "pending".equalsIgnoreCase(status)) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Start Working on this Order?")
+                        .setMessage("OID: " +orderId)
+                        .setPositiveButton("Begin", (dialog, which) -> {
+                            FirebaseFirestore.getInstance()
+                                    .collection("orders")
+                                    .document(orderId)
+                                    .update("status", "ongoing")
+                                    .addOnSuccessListener(aVoid ->
+                                            Toast.makeText(context, "Order successfully finished.", Toast.LENGTH_SHORT).show())
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(context, "Failed to update order.", Toast.LENGTH_SHORT).show());
+                        })
+                        .setNeutralButton("Cancel", null)
+                        .show();
+            } else if (order.isAccepted() && "ongoing".equalsIgnoreCase(status)) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Done with this Order?")
+                        .setMessage("OID: " +orderId)
+                        .setPositiveButton("Finished", (dialog, which) -> {
+                            FirebaseFirestore.getInstance()
+                                    .collection("orders")
+                                    .document(orderId)
+                                    .update("status", "finished")
+                                    .addOnSuccessListener(aVoid ->
+                                            Toast.makeText(context, "Order successfully finished.", Toast.LENGTH_SHORT).show())
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(context, "Failed to update order.", Toast.LENGTH_SHORT).show());
+                        })
+                        .setNeutralButton("Cancel", null)
+                        .show();
             } else if ("finished".equalsIgnoreCase(status) || "cancelled".equalsIgnoreCase(status)) {
                 new AlertDialog.Builder(context)
                         .setTitle("Archive Order")
@@ -147,8 +188,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             }
         });
 
-
-
     }
 
     @Override
@@ -157,7 +196,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     }
 
     public static class OrderViewHolder extends RecyclerView.ViewHolder {
-        TextView serviceTextView, statusTextView, timeTextView, shopNameTextView;
+        TextView serviceTextView, statusTextView, timeTextView, usernameTextView, contactTextView;
         LinearLayout clickable;
         MaterialCardView statuscv;
 
@@ -166,7 +205,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             serviceTextView = itemView.findViewById(R.id.serviceTextView);
             statusTextView = itemView.findViewById(R.id.statusTextView);
             timeTextView = itemView.findViewById(R.id.timeTextView);
-            shopNameTextView = itemView.findViewById(R.id.shopNameTextView);
+            usernameTextView = itemView.findViewById(R.id.usernameTextView);
+            contactTextView = itemView.findViewById(R.id.contactTextView);
             statuscv = itemView.findViewById(R.id.statuscv);
             clickable = itemView.findViewById(R.id.clickable);
         }

@@ -29,6 +29,7 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -50,6 +51,9 @@ public class UserInfo extends AppCompatActivity {
     private String verificationId; // To store verification ID for OTP
     private PhoneAuthProvider.ForceResendingToken resendToken; // To store resend token
     private Dialog otpDialog;
+
+    private String userType; // Class-level variable to store user type
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,11 +144,23 @@ public class UserInfo extends AppCompatActivity {
         });
 
         binding.cancelBtn.setOnClickListener(v -> {
-            // Return to UserPage or the previous activity
-            Intent intent = new Intent(this, UserPage.class);
-            startActivity(intent);
+            if ("manager".equalsIgnoreCase(userType)) {
+                // Redirect to AdminPage
+                Intent intent = new Intent(this, AdminPage.class);
+                startActivity(intent);
+            } else if ("customer".equalsIgnoreCase(userType)) {
+                // Redirect to UserPage
+                Intent intent = new Intent(this, UserPage.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Unknown user type. Returning to default page.", Toast.LENGTH_SHORT).show();
+                // Optionally, send to a default page if usertype is invalid
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+            }
             finish(); // Close UserInfo activity
         });
+
     }
 
     @Override
@@ -162,32 +178,50 @@ public class UserInfo extends AppCompatActivity {
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
-                            // Check if username and contact fields already exist
+                            // Fetch and store usertype
+                            userType = documentSnapshot.getString("usertype");
+                            String shopName = documentSnapshot.getString("shopName");
                             String username = documentSnapshot.getString("username");
                             String contact = documentSnapshot.getString("contact");
 
-                            if (username != null) {
-                                // Populate the fields
-                                binding.username.setText(username);
-                                binding.username.setEnabled(false);
-                                
-                                // Show the Cancel button
-                                binding.cancelBtn.setVisibility(View.VISIBLE);
+                            if ("manager".equalsIgnoreCase(userType)) {
+                                // Show shopName layout only
+                                binding.shopnameLayout.setVisibility(View.VISIBLE);
+                                binding.usernameLayout.setVisibility(View.GONE);
 
-                                // Disable Submit button initially
-                                binding.submitBtn.setEnabled(false);
+                                if (shopName != null && !shopName.isEmpty()) {
+                                    binding.shopname.setText(shopName);
+                                    binding.shopname.setEnabled(false);
+                                }
+                            } else if ("customer".equalsIgnoreCase(userType)) {
+                                // Show username layout only
+                                binding.usernameLayout.setVisibility(View.VISIBLE);
+                                binding.shopnameLayout.setVisibility(View.GONE);
 
-                                // Add TextWatcher to monitor changes and re-enable the Submit button
-                                setupFieldChangeWatcher(contact);
-
-                            }    if (contact != null) {
-                                binding.contact.setText(contact);
+                                if (username != null && !username.isEmpty()) {
+                                    binding.username.setText(username);
+                                    binding.username.setEnabled(false);
+                                }
                             } else {
-                                // Hide Cancel button if no values are found
+                                // Fallback: Show both layouts
+                                binding.shopnameLayout.setVisibility(View.VISIBLE);
+                                binding.usernameLayout.setVisibility(View.VISIBLE);
+                            }
+
+                            if (contact != null && !contact.isEmpty()) {
+                                binding.contact.setText(contact);
+                            }
+
+                            if ((shopName != null || username != null) && contact != null) {
+                                binding.cancelBtn.setVisibility(View.VISIBLE);
+                                binding.submitBtn.setEnabled(false);
+                            } else {
                                 binding.cancelBtn.setVisibility(View.GONE);
                             }
                         } else {
-                            // Hide Cancel button if no user data exists
+                            // Show all layouts if user data is missing
+                            binding.usernameLayout.setVisibility(View.VISIBLE);
+                            binding.shopnameLayout.setVisibility(View.VISIBLE);
                             binding.cancelBtn.setVisibility(View.GONE);
                         }
                     })
@@ -199,8 +233,6 @@ public class UserInfo extends AppCompatActivity {
             finish(); // Finish the activity if the user is not logged in
         }
     }
-
-
 
 
     // Monitor field changes to re-enable Submit button
@@ -246,29 +278,45 @@ public class UserInfo extends AppCompatActivity {
     private boolean validateAllFields() {
         boolean isValid = true;
 
-        String username = binding.username.getText().toString().trim();
+        // Validate username only if its layout is not GONE
+        if (binding.usernameLayout.getVisibility() != View.GONE) {
+            String username = binding.username.getText().toString().trim();
 
-        // Validate username
-        if (username.isEmpty()) {
-            binding.usernameLayout.setError("Username is required");
-            isValid = false;
-        } else if (username.length() < 6) {
-            binding.usernameLayout.setError("Username must be at least 6 characters long");
-            isValid = false;
-        } else if (username.length() > 20) {
-            binding.usernameLayout.setError("Username cannot exceed 20 characters");
-            isValid = false;
-        } else if (!username.matches("^[a-zA-Z0-9._-]+$")) {
-            binding.usernameLayout.setError("Username can only contain letters, numbers, and special characters (@, ., -, _)");
-            isValid = false;
-        } else if (hasRepeatedCharacters(username)) {
-            binding.usernameLayout.setError("Username contains repeated characters");
-            isValid = false;
-        } else {
-            binding.usernameLayout.setError(null); // Clear error if valid
+            // Validate username
+            if (username.isEmpty()) {
+                binding.usernameLayout.setError("Username is required");
+                isValid = false;
+            } else if (username.length() < 6) {
+                binding.usernameLayout.setError("Username must be at least 6 characters long");
+                isValid = false;
+            } else if (username.length() > 20) {
+                binding.usernameLayout.setError("Username cannot exceed 20 characters");
+                isValid = false;
+            } else if (!username.matches("^[a-zA-Z0-9._-]+$")) {
+                binding.usernameLayout.setError("Username can only contain letters, numbers, and special characters (@, ., -, _)");
+                isValid = false;
+            } else if (hasRepeatedCharacters(username)) {
+                binding.usernameLayout.setError("Username contains repeated characters");
+                isValid = false;
+            } else {
+                binding.usernameLayout.setError(null); // Clear error if valid
+            }
         }
 
-        // Validate contact number
+        // Validate shopname only if its layout is not GONE (for manager users)
+        if (binding.shopnameLayout.getVisibility() != View.GONE) {
+            String shopName = binding.shopname.getText().toString().trim();
+
+            // Validate shop name
+            if (shopName.isEmpty()) {
+                binding.shopnameLayout.setError("Shop Name is required");
+                isValid = false;
+            } else {
+                binding.shopnameLayout.setError(null); // Clear error if valid
+            }
+        }
+
+        // Validate contact number (always validate if visible)
         String contactNumber = binding.contact.getText().toString().trim();
         if (contactNumber.isEmpty()) {
             binding.contactLayout.setError("Contact Number is required");
@@ -379,40 +427,65 @@ public class UserInfo extends AppCompatActivity {
         }
     }
 
+    // Send OTP to the provided phone number for verification (not for login)
     private void sendOtp(String phoneNumber) {
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                phoneNumber,
-                60,
-                TimeUnit.SECONDS,
-                this,
-                new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+        // Show progress dialog while waiting for OTP to be sent
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Sending OTP...");
+        progressDialog.setCancelable(false); // Prevent dismissing by tapping outside
+        progressDialog.show();
+
+        // PhoneAuthOptions to send OTP
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                .setPhoneNumber(phoneNumber) // Phone number to verify
+                .setTimeout(60L, TimeUnit.SECONDS) // Timeout duration
+                .setActivity(this) // Activity (for callback binding)
+                .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     @Override
                     public void onVerificationCompleted(PhoneAuthCredential credential) {
-                        String otpCode = credential.getSmsCode();
-                        if (otpCode != null && otpDialog != null) {
+                        // If OTP is automatically verified (e.g., via auto-retrieval)
+                        String otp = credential.getSmsCode();
+                        if (otp != null) {
                             TextInputEditText otpInput = otpDialog.findViewById(R.id.otp_input);
                             if (otpInput != null) {
-                                otpInput.setText(otpCode); // Pre-fill the OTP input field
+                                otpInput.setText(otp);
                             }
-                            Toast.makeText(UserInfo.this, "OTP retrieved automatically", Toast.LENGTH_SHORT).show();
+                        }
+
+                        // Dismiss the progress dialog if verification is completed
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
                         }
                     }
 
                     @Override
                     public void onVerificationFailed(FirebaseException e) {
                         Toast.makeText(UserInfo.this, "OTP Verification Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        // Dismiss the progress dialog if verification failed
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                     }
 
                     @Override
                     public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token) {
+                        // Save verificationId for later OTP verification
                         UserInfo.this.verificationId = verificationId;
-                        resendToken = token;
                         Toast.makeText(UserInfo.this, "OTP Sent to " + phoneNumber, Toast.LENGTH_SHORT).show();
 
                         // Start the cooldown timer
                         startOtpCooldown();
+
+                        // Dismiss the progress dialog once OTP is sent
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                     }
-                });
+                })
+                .build();
+
+        PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
     private CountDownTimer otpCooldownTimer; // Single timer instance
@@ -548,8 +621,6 @@ public class UserInfo extends AppCompatActivity {
         }
     }
 
-
-
     private void verifyOtp(String otp, ProgressDialog progressDialog) {
         if (verificationId == null) {
             Toast.makeText(this, "Please request OTP first.", Toast.LENGTH_SHORT).show();
@@ -580,20 +651,65 @@ public class UserInfo extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             String uid = currentUser.getUid();
-            Map<String, Object> userData = new HashMap<>();
-            userData.put("username", binding.username.getText().toString());
-            userData.put("contact", binding.contact.getText().toString());
 
+            // Get the usertype from Firestore
             firestore.collection("users")
-                    .document(uid) // Update the existing user document
-                    .set(userData, SetOptions.merge()) // Use merge to avoid overwriting other fields
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Data updated successfully", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(this, UserPage.class);
-                        startActivity(intent);
-                        finish();
+                    .document(uid)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Get the usertype to determine which fields to update
+                            String userType = documentSnapshot.getString("usertype");
+
+                            // Prepare a map to store updated user data
+                            Map<String, Object> userData = new HashMap<>();
+
+                            // Check the usertype and decide which fields to update
+                            if ("manager".equalsIgnoreCase(userType)) {
+                                // For managers, only update shopName and contact
+                                if (!binding.shopname.getText().toString().isEmpty()) {
+                                    userData.put("shopName", binding.shopname.getText().toString());
+                                }
+                            } else if ("customer".equalsIgnoreCase(userType)) {
+                                // For customers, only update username and contact
+                                if (!binding.username.getText().toString().isEmpty()) {
+                                    userData.put("username", binding.username.getText().toString());
+                                }
+                            }
+
+                            // Update the contact field if it's not empty
+                            String contact = binding.contact.getText().toString();
+                            if (!contact.isEmpty()) {
+                                userData.put("contact", contact);
+                            }
+
+                            // Only update if there's something to update
+                            if (!userData.isEmpty()) {
+                                firestore.collection("users")
+                                        .document(uid) // Update the existing user document
+                                        .set(userData, SetOptions.merge()) // Use merge to avoid overwriting other fields
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(this, "Data updated successfully", Toast.LENGTH_SHORT).show();
+
+                                            // Redirect based on usertype
+                                            Intent intent;
+                                            if ("manager".equalsIgnoreCase(userType)) {
+                                                intent = new Intent(this, AdminPage.class); // Redirect to AdminPage for manager
+                                            } else {
+                                                intent = new Intent(this, UserPage.class); // Redirect to UserPage for customer
+                                            }
+                                            startActivity(intent);
+                                            finish(); // Close the activity
+                                        })
+                                        .addOnFailureListener(e -> Toast.makeText(this, "Error updating user: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                            } else {
+                                Toast.makeText(this, "No data to update.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(this, "User not found.", Toast.LENGTH_SHORT).show();
+                        }
                     })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Error updating user: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> Toast.makeText(this, "Error fetching user data: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         } else {
             Toast.makeText(this, "User not logged in. Please log in again.", Toast.LENGTH_SHORT).show();
         }

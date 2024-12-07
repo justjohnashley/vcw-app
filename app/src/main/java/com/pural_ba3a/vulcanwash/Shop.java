@@ -3,11 +3,15 @@ package com.pural_ba3a.vulcanwash;
 public class Shop {
     private String uid;
     private String shopName;
+    private String username;
+    private String contact;
 
     // Constructor
-    public Shop(String uid, String shopName) {
+    public Shop(String uid, String shopName, String username, String contact) {
         this.uid = uid;
         this.shopName = shopName;
+        this.username = username;
+        this.contact = contact;
     }
 
     public String getUid() {
@@ -16,6 +20,14 @@ public class Shop {
 
     public String getShopName() {
         return shopName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getContact() {
+        return contact;
     }
 }
 
